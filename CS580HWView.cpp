@@ -336,12 +336,12 @@ LRESULT CCS580HWView::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			up_pressed = true;
 			for(int i=0; i<AAKERNEL_SIZE; i++)
 			{
-				m_pApplication->m_pRender[i]->xita += 1;
+				m_pApplication->m_pRender[i]->xita -= 1;
 				//check if xita is out of boundary
-				if(m_pApplication->m_pRender[i]->xita >= 90)m_pApplication->m_pRender[i]->xita = 90;
+				if(m_pApplication->m_pRender[i]->xita <= 0)m_pApplication->m_pRender[i]->xita = 0;
 				int phi_degree = m_pApplication->m_pRender[i]->phi;
 				int xita_degree = m_pApplication->m_pRender[i]->xita;
-				m_pApplication->m_pRender[i]->camera.position[0] = cos(phi_degree * PI/180) * sin(xita_degree * PI/180) * RADIUS;
+				m_pApplication->m_pRender[i]->camera.position[0] = sin(xita_degree * PI/180) * cos(phi_degree * PI/180) * RADIUS;
 				m_pApplication->m_pRender[i]->camera.position[1] = sin(phi_degree * PI/180) * sin(xita_degree * PI/180) * RADIUS;
 				m_pApplication->m_pRender[i]->camera.position[2] = cos(xita * PI/180) * RADIUS;
 				m_pApplication->m_pRender[i]->matlevel = 0;
@@ -354,14 +354,14 @@ LRESULT CCS580HWView::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
             down_pressed = true;
 			for(int i=0; i<AAKERNEL_SIZE; i++)
 			{
-				m_pApplication->m_pRender[i]->xita -= 1;
+				m_pApplication->m_pRender[i]->xita += 1;
 				//check if xita is out of boundary
-				if(m_pApplication->m_pRender[i]->xita <= -90)m_pApplication->m_pRender[i]->xita = -90;
+				if(m_pApplication->m_pRender[i]->xita >= 180)m_pApplication->m_pRender[i]->xita = 180;
 				int phi_degree = m_pApplication->m_pRender[i]->phi;
 				int xita_degree = m_pApplication->m_pRender[i]->xita;
-				m_pApplication->m_pRender[i]->camera.position[0] = cos(phi_degree * PI/180) * sin(xita_degree * PI/180) * RADIUS;
+				m_pApplication->m_pRender[i]->camera.position[0] = sin(xita_degree * PI/180) * cos(phi_degree * PI/180) * RADIUS;
 				m_pApplication->m_pRender[i]->camera.position[1] = sin(phi_degree * PI/180) * sin(xita_degree * PI/180) * RADIUS;
-				m_pApplication->m_pRender[i]->camera.position[2] = cos(xita_degree * PI/180) * RADIUS;
+				m_pApplication->m_pRender[i]->camera.position[2] = cos(xita * PI/180) * RADIUS;
 				m_pApplication->m_pRender[i]->matlevel = 0;
 				GzBeginRender(m_pApplication->m_pRender[i]);
 			}
@@ -372,12 +372,12 @@ LRESULT CCS580HWView::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			left_pressed = true;
 			for(int i=0; i<AAKERNEL_SIZE; i++)
 			{
-				m_pApplication->m_pRender[i]->phi -= 1;
+				m_pApplication->m_pRender[i]->phi += 1;
 				int phi_degree = m_pApplication->m_pRender[i]->phi;
 				int xita_degree = m_pApplication->m_pRender[i]->xita;
-				m_pApplication->m_pRender[i]->camera.position[0] = cos(phi_degree * PI/180) * sin(xita_degree * PI/180) * RADIUS;
+				m_pApplication->m_pRender[i]->camera.position[0] = sin(xita_degree * PI/180) * cos(phi_degree * PI/180) * RADIUS;
 				m_pApplication->m_pRender[i]->camera.position[1] = sin(phi_degree * PI/180) * sin(xita_degree * PI/180) * RADIUS;
-				m_pApplication->m_pRender[i]->camera.position[2] = cos(xita_degree * PI/180) * RADIUS;
+				m_pApplication->m_pRender[i]->camera.position[2] = cos(xita * PI/180) * RADIUS;
 				m_pApplication->m_pRender[i]->matlevel = 0;
 				GzBeginRender(m_pApplication->m_pRender[i]);
 			}
@@ -388,12 +388,12 @@ LRESULT CCS580HWView::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
             right_pressed = true;
 			for(int i=0; i<AAKERNEL_SIZE; i++)
 			{
-				m_pApplication->m_pRender[i]->phi += 1;
+				m_pApplication->m_pRender[i]->phi -= 1;
 				int phi_degree = m_pApplication->m_pRender[i]->phi;
 				int xita_degree = m_pApplication->m_pRender[i]->xita;
-				m_pApplication->m_pRender[i]->camera.position[0] = cos(phi_degree * PI/180) * sin(xita_degree * PI/180) * RADIUS;
+				m_pApplication->m_pRender[i]->camera.position[0] = sin(xita_degree * PI/180) * cos(phi_degree * PI/180) * RADIUS;
 				m_pApplication->m_pRender[i]->camera.position[1] = sin(phi_degree * PI/180) * sin(xita_degree * PI/180) * RADIUS;
-				m_pApplication->m_pRender[i]->camera.position[2] = cos(xita_degree * PI/180) * RADIUS;
+				m_pApplication->m_pRender[i]->camera.position[2] = cos(xita * PI/180) * RADIUS;
 				m_pApplication->m_pRender[i]->matlevel = 0;
 				GzBeginRender(m_pApplication->m_pRender[i]);
 			}
@@ -464,3 +464,4 @@ LRESULT CCS580HWView::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
      }
 	return CView::DefWindowProc(message, wParam, lParam);
 }
+
