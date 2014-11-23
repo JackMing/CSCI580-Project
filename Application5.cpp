@@ -197,11 +197,12 @@ GzMatrix	rotateY =
 		status |= GzPutAttribute(m_pRender[sampleNum], 6, nameListShader, valueListShader);
 		status |= GzPutAttribute(m_pRender[sampleNum], 2, nameListSample, valueListSample);
 		//put camera rotation phi and xita
-		float start_degree = 0;
+		float start_phi_degree = 0;
+		float start_xita_degree = 90;
 		nameListRotate[0] = GZ_CAMERAPHI;
-		valueListRotate[0] = (GzPointer)&start_degree;
+		valueListRotate[0] = (GzPointer)&start_phi_degree;
 		nameListRotate[1] = GZ_CAMERAXITA;
-		valueListRotate[1] = (GzPointer)&start_degree;
+		valueListRotate[1] = (GzPointer)&start_xita_degree;
 		status |= GzPutAttribute(m_pRender[sampleNum], 2, nameListRotate, valueListRotate);
 
 		status |= GzPushMatrix(m_pRender[sampleNum], scale);  
