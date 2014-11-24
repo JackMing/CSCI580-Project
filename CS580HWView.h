@@ -26,7 +26,8 @@ public:
 public:
 	Application* m_pApplication;
 	void DrawFrameBuffer(CDC *pDC);
-
+private:
+	int Xform_view(GzMatrix mat, GzCoord vec);
 // Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CCS580HWView)
