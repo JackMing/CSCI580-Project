@@ -181,6 +181,12 @@ int GzFreeRender(GzRender *render)
 /* 
 -free all renderer resources
 */
+	for(int i=0;i<6;i++){
+		if(image[i]!=NULL){
+			free(image[i]);
+			image[i]=NULL;
+		}
+	}
 	free(render);
 	return GZ_SUCCESS;
 }
@@ -718,7 +724,7 @@ void span(GzRender *render, GzEdge *le, GzEdge *re){
 							face = X;
 							u = (R[Y]+absX)/2/absX;
 							v = (R[Z]+absX)/2/absX;
-							/*
+							
 							if(R[X]<0){
 								face+=3;
 								u = abs(1-u);
@@ -726,46 +732,45 @@ void span(GzRender *render, GzEdge *le, GzEdge *re){
 							}else{
 								v = abs(1-v);
 							}
-							*/
+							
 						}else{
 							face = Z;
 							u = (R[X]+absZ)/2/absZ;
 							v = (R[Y]+absZ)/2/absZ;
-							/*
+							
 							if(R[Z]<0){
 								face+=3;
 							}else{
 								v = abs(1-v);						
 							}
-							*/
+							
 						}
 					}else{
 						if(absY>absZ){
 							face = Y;
 							u = (R[X]+absY)/2/absY;
 							v = (R[Z]+absY)/2/absY;
-							/*
+							
 							if(R[Y]<0){
 								face+=3;
 								v = abs(1-v);						
 							}else{
 								v = abs(1-v);
 							}
-							*/
+							
 						}else{
 							face = Z;
 							u = (R[X]+absZ)/2/absZ;
 							v = (R[Y]+absZ)/2/absZ;
-							/*
+							
 							if(R[Z]<0){
 								face+=3;
 							}else{
 								v = abs(1-v);						
 							}
-							*/
 						}
 					}
-					if(R[face]<0) face+=3;
+					//if(R[face]<0) face+=3;
 					/********************************************
 					  CubeMap Lookup - Initialize the cube map
 					*********************************************/

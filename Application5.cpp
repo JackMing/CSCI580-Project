@@ -19,7 +19,7 @@ static char THIS_FILE[]=__FILE__;
 #define new DEBUG_NEW
 #endif
 
-#define INFILE  "sphere.asc"
+#define INFILE  "sphere_new.asc"
 #define OUTFILE "output.ppm"
 
 
@@ -72,9 +72,9 @@ int Application5::Initialize()
 /* Translation matrix */
 GzMatrix	scale = 
 { 
-	7.0,	0.0,	0.0,	0.0, 
-	0.0,	7.0,	0.0,	0.0, 
-	0.0,	0.0,	7.0,	0.0, 
+	1,	0.0,	0.0,	0.0, 
+	0.0,	1,	0.0,	0.0, 
+	0.0,	0.0,	1,	0.0, 
 	0.0,	0.0,	0.0,	1.0 
 }; 
  
