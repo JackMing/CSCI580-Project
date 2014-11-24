@@ -551,10 +551,17 @@ void GzScanLine(GzRender *render, GzCoord *vertexList, GzCoord *normList, GzText
 		if(!upperTri){
 			/* if the edge 12 is horizontal and edge 23 is not, 
 				move current position of the edge 13 to the first scan line*/
-			cond = false;
-			Le = &e13;
-			delY_L = ceil(Le->current[Y])-Le->current[Y];
-			edgeAdvanceDel(Le, delY_L);
+			if(e23.current[X] > e13.current[X]){
+				cond = false;
+				Le = &e13;
+				delY_L = ceil(Le->current[Y])-Le->current[Y];
+				edgeAdvanceDel(Le, delY_L);
+			}else{
+				cond = true;
+				Re = &e13;
+				delY_R = ceil(Re->current[Y])-Re->current[Y];
+				edgeAdvanceDel(Re, delY_R);
+			}
 		}
 		if(cond){  //L(1-2-3) R(1-3)
 			Le = &e23;

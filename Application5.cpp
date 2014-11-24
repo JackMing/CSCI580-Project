@@ -157,7 +157,7 @@ GzMatrix	rotateY =
 	* Select either GZ_COLOR or GZ_NORMALS as interpolation mode  
 	*/
 	nameListShader[1]  = GZ_INTERPOLATE;
-	interpStyle = GZ_NORMAL;         /* Phong shading */
+	interpStyle = GZ_NORMALS;         /* Phong shading */
 	valueListShader[1] = (GzPointer)&interpStyle;
 	nameListShader[2]  = GZ_AMBIENT_COEFFICIENT;
 	valueListShader[2] = (GzPointer)ambientCoefficient;
@@ -259,7 +259,9 @@ int Application5::Render()
 	* Walk through the list of triangles, set color 
 	* and render each triangle 
 	*/ 
-	while( fscanf(infile, "%s", dummy) == 1) { 	/* read in tri word */
+	int count=0;
+	while( fscanf(infile, "%s", dummy) == 1 && count <1000) { 	/* read in tri word */
+		count++;
 	    fscanf(infile, "%f %f %f %f %f %f %f %f", 
 		&(vertexList[0][0]), &(vertexList[0][1]),  
 		&(vertexList[0][2]), 
@@ -306,7 +308,7 @@ int Application5::Render()
 
 	GzFlushDisplay2File(outfile, m_pDisplay[0]); 	/* write out or update display to file*/
 	GzFlushDisplay2FrameBuffer(m_pFrameBuffer, m_pDisplay[0]);	// write out or update display to frame buffer
-
+	//}
 	/* 
 	 * Close file
 	 */ 
