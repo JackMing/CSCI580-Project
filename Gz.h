@@ -56,7 +56,7 @@ typedef float   GzTextureIndex[2];
 typedef float   GzMatrix[4][4];
 typedef int	GzDepth;		/* z is signed for clipping */
 
-typedef	int	(*GzTexture)(float u, float v,int face, GzColor color);	/* pointer to texture sampling method */
+typedef	int	(*GzTexture)(float u, float v, GzColor color);	/* pointer to texture sampling method */
 /* u,v parameters [0,1] are defined tex_fun(float u, float v, GzColor color) */
 
 /*
