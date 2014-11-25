@@ -767,6 +767,7 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int face){
 								v = abs(1-v);						
 							}else{
 								v = abs(1-v);
+								u = abs(1-u);
 							}
 							
 						}else{
