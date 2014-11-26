@@ -7,7 +7,7 @@
  */
 #define GZ_SUCCESS      0
 #define GZ_FAILURE      1
-#define RADIUS 100;
+#define RADIUS 50;
 #define PI 3.14159265
 /*
  * name list tokens

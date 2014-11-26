@@ -338,7 +338,7 @@ LRESULT CCS580HWView::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				
 				
-				m_pApplication->m_pRender[i]->xita -= 2;
+				m_pApplication->m_pRender[i]->xita -= 10;
 				//check if xita is out of boundary
 				//if(m_pApplication->m_pRender[i]->xita <= 0)m_pApplication->m_pRender[i]->xita = 0;
 				int phi_degree = m_pApplication->m_pRender[i]->phi;
@@ -363,7 +363,7 @@ LRESULT CCS580HWView::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
             down_pressed = true;
 			for(int i=0; i<AAKERNEL_SIZE; i++)
 			{
-				m_pApplication->m_pRender[i]->xita += 2;
+				m_pApplication->m_pRender[i]->xita += 10;
 				//check if xita is out of boundary
 				//if(m_pApplication->m_pRender[i]->xita >= 180)m_pApplication->m_pRender[i]->xita = 180;
 				int phi_degree = m_pApplication->m_pRender[i]->phi;
@@ -387,7 +387,7 @@ LRESULT CCS580HWView::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			left_pressed = true;
 			for(int i=0; i<AAKERNEL_SIZE; i++)
 			{
-				m_pApplication->m_pRender[i]->phi -= 1;
+				m_pApplication->m_pRender[i]->phi -= 10;
 				int phi_degree = m_pApplication->m_pRender[i]->phi;
 				int xita_degree = m_pApplication->m_pRender[i]->xita;
 				m_pApplication->m_pRender[i]->camera.position[0] = sin(xita_degree * PI/180) * cos(phi_degree * PI/180) * RADIUS;
@@ -409,7 +409,7 @@ LRESULT CCS580HWView::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
             right_pressed = true;
 			for(int i=0; i<AAKERNEL_SIZE; i++)
 			{
-				m_pApplication->m_pRender[i]->phi += 1;
+				m_pApplication->m_pRender[i]->phi += 10;
 				int phi_degree = m_pApplication->m_pRender[i]->phi;
 				int xita_degree = m_pApplication->m_pRender[i]->xita;
 				m_pApplication->m_pRender[i]->camera.position[0] = sin(xita_degree * PI/180) * cos(phi_degree * PI/180) * RADIUS;
