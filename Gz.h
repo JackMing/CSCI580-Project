@@ -7,11 +7,11 @@
  */
 #define GZ_SUCCESS      0
 #define GZ_FAILURE      1
-<<<<<<< HEAD
+
 #define RADIUS 50;
-=======
+
 #define RADIUS 3;
->>>>>>> origin/master
+
 #define PI 3.14159265
 /*
  * name list tokens

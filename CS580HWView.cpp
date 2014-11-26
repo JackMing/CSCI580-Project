@@ -345,7 +345,7 @@ LRESULT CCS580HWView::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 				int xita_degree = m_pApplication->m_pRender[i]->xita;
 				m_pApplication->m_pRender[i]->camera.position[0] = sin(xita_degree * PI/180) * cos(phi_degree * PI/180) * RADIUS;
 				m_pApplication->m_pRender[i]->camera.position[1] = sin(phi_degree * PI/180) * sin(xita_degree * PI/180) * RADIUS;
-				m_pApplication->m_pRender[i]->camera.position[2] = cos(xita * PI/180) * RADIUS;
+				m_pApplication->m_pRender[i]->camera.position[2] = cos(xita_degree * PI/180) * RADIUS;
 				m_pApplication->m_pRender[i]->matlevel = 0;
 				//float vector[4] = {0.0, 0.2, 0.0, 0.0};
 				//Xform_view(m_pApplication->m_pRender[i]->camera.Xwi,vector);
@@ -370,7 +370,7 @@ LRESULT CCS580HWView::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 				int xita_degree = m_pApplication->m_pRender[i]->xita;
 				m_pApplication->m_pRender[i]->camera.position[0] = sin(xita_degree * PI/180) * cos(phi_degree * PI/180) * RADIUS;
 				m_pApplication->m_pRender[i]->camera.position[1] = sin(phi_degree * PI/180) * sin(xita_degree * PI/180) * RADIUS;
-				m_pApplication->m_pRender[i]->camera.position[2] = cos(xita * PI/180) * RADIUS;
+				m_pApplication->m_pRender[i]->camera.position[2] = cos(xita_degree * PI/180) * RADIUS;
 				m_pApplication->m_pRender[i]->matlevel = 0;
 				//float vector[4] = {0.0, -0.2, 0.0, 0.0};
 				//Xform_view(m_pApplication->m_pRender[i]->camera.Xwi,vector);
@@ -392,7 +392,7 @@ LRESULT CCS580HWView::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 				int xita_degree = m_pApplication->m_pRender[i]->xita;
 				m_pApplication->m_pRender[i]->camera.position[0] = sin(xita_degree * PI/180) * cos(phi_degree * PI/180) * RADIUS;
 				m_pApplication->m_pRender[i]->camera.position[1] = sin(phi_degree * PI/180) * sin(xita_degree * PI/180) * RADIUS;
-				m_pApplication->m_pRender[i]->camera.position[2] = cos(xita * PI/180) * RADIUS;
+				m_pApplication->m_pRender[i]->camera.position[2] = cos(xita_degree * PI/180) * RADIUS;
 				m_pApplication->m_pRender[i]->matlevel = 0;
 				//float vector[4] = {-0.2, 0.0, 0.0, 0.0};
 				//Xform_view(m_pApplication->m_pRender[i]->camera.Xwi,vector);
@@ -414,7 +414,7 @@ LRESULT CCS580HWView::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 				int xita_degree = m_pApplication->m_pRender[i]->xita;
 				m_pApplication->m_pRender[i]->camera.position[0] = sin(xita_degree * PI/180) * cos(phi_degree * PI/180) * RADIUS;
 				m_pApplication->m_pRender[i]->camera.position[1] = sin(phi_degree * PI/180) * sin(xita_degree * PI/180) * RADIUS;
-				m_pApplication->m_pRender[i]->camera.position[2] = cos(xita * PI/180) * RADIUS;
+				m_pApplication->m_pRender[i]->camera.position[2] = cos(xita_degree * PI/180) * RADIUS;
 				m_pApplication->m_pRender[i]->matlevel = 0;
 				//float vector[4] = {0.2, 0.0, 0.0, 0.0};
 				//Xform_view(m_pApplication->m_pRender[i]->camera.Xwi,vector);
