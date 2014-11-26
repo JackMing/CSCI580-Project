@@ -7,7 +7,11 @@
  */
 #define GZ_SUCCESS      0
 #define GZ_FAILURE      1
+<<<<<<< HEAD
 #define RADIUS 50;
+=======
+#define RADIUS 3;
+>>>>>>> origin/master
 #define PI 3.14159265
 /*
  * name list tokens
@@ -16,7 +20,7 @@
 #define GZ_POSITION          1
 #define GZ_NORMAL            2
 #define GZ_TEXTURE_INDEX     3
-
+#define GZ_FACE     4
 
 #define	GZ_AASHIFTX	44	/* antialiasing screen offset */
 #define	GZ_AASHIFTY	45	/* antialiasing screen offset */

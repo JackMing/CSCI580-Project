@@ -19,7 +19,7 @@ static char THIS_FILE[]=__FILE__;
 #define new DEBUG_NEW
 #endif
 
-#define INFILE  "sphere_new.asc"
+#define INFILE  "sphere.asc"
 #define OUTFILE "output.ppm"
 
 
@@ -107,9 +107,9 @@ GzMatrix	rotateY =
 
 	
 	/* set up a app-defined camera */
-    camera.position[X] = RADIUS;
-    camera.position[Y] = 0;
-    camera.position[Z] = 0;
+    camera.position[X] = 1.4142;
+    camera.position[Y] = -1.4142;
+    camera.position[Z] = 0;//-1.4142;
 
     camera.lookat[X] = 0;
     camera.lookat[Y] = 0;

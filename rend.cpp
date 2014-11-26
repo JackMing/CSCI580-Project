@@ -22,11 +22,11 @@ typedef struct{
 // Function declaration for the DDA algorithm
 bool edgeInit(GzRender*,GzEdge*, float*, float*, float*, float*, float*, float*);
 void edgeAdvanceDel(GzEdge*, float);
-void GzScanLine(GzRender*, GzCoord*, GzCoord*, GzTextureIndex*);
+void GzScanLine(GzRender*, GzCoord*, GzCoord*, GzTextureIndex*, int);
 void sortV(GzCoord *,GzCoord *, GzTextureIndex*);
 void swapV(GzCoord *,GzCoord *, GzTextureIndex*, int, int);
-void span(GzRender*, GzEdge*, GzEdge*);
-void edgeAdvance(GzRender*, GzEdge*, GzEdge*);
+void span(GzRender*, GzEdge*, GzEdge*, int);
+void edgeAdvance(GzRender*, GzEdge*, GzEdge*, int);
 
 //HW3
 void unitVector(GzCoord);
@@ -409,6 +409,7 @@ int GzPutTriangle(GzRender	*render, int numParts, GzToken *nameList, GzPointer	*
 	GzCoord vertexList[3];
 	GzCoord normList[3];
 	GzTextureIndex texureList[3];
+	int face = 0;
 	int status = 0;
 	for(int i=0; i<numParts; i++){
 		switch(nameList[i]){
@@ -461,6 +462,9 @@ int GzPutTriangle(GzRender	*render, int numParts, GzToken *nameList, GzPointer	*
 		case GZ_TEXTURE_INDEX:
 			memcpy(texureList,valueList[i],sizeof(GzTextureIndex)*3);
 			break;
+		case GZ_FACE:
+			face = *(int*)valueList[i];
+			break;
 		default:
 			return GZ_FAILURE;
 		}
@@ -468,7 +472,7 @@ int GzPutTriangle(GzRender	*render, int numParts, GzToken *nameList, GzPointer	*
 	if (status) 
 		return GZ_SUCCESS;
 	else{
-		GzScanLine(render, vertexList, normList, texureList);
+		GzScanLine(render, vertexList, normList, texureList, face);
 	}
 	return GZ_SUCCESS;
 }
@@ -504,7 +508,7 @@ short	ctoi(float color)		/* convert float color to GzIntensity short */
   return(short)((int)(color * ((1 << 12) - 1)));
 }
 
-void GzScanLine(GzRender *render, GzCoord *vertexList, GzCoord *normList, GzTextureIndex* textureList){
+void GzScanLine(GzRender *render, GzCoord *vertexList, GzCoord *normList, GzTextureIndex* textureList, int face){
 	
 	sortV(vertexList, normList, textureList);
 	warpTex(vertexList, textureList);
@@ -540,7 +544,7 @@ void GzScanLine(GzRender *render, GzCoord *vertexList, GzCoord *normList, GzText
 		edgeAdvanceDel(Re, delY_R);
 
 		/* Advance toward the lower end of first two edges */
-		edgeAdvance(render, Le, Re);
+		edgeAdvance(render, Le, Re, face);
 	}
 
 	/*--------------------------------------------------------------------------
@@ -574,7 +578,7 @@ void GzScanLine(GzRender *render, GzCoord *vertexList, GzCoord *normList, GzText
 		}
 
 		/* Advance toward the end of the edges, vertex 3 */
-		edgeAdvance(render, Le, Re);
+		edgeAdvance(render, Le, Re, face);
 	}
 }
 
@@ -582,11 +586,11 @@ void GzScanLine(GzRender *render, GzCoord *vertexList, GzCoord *normList, GzText
 	advance two edges toward the end vertext of two edges
 	and span each scanline in the between
 */
-void edgeAdvance(GzRender *render, GzEdge *Le, GzEdge *Re){
+void edgeAdvance(GzRender *render, GzEdge *Le, GzEdge *Re, int face){
 
 	while((Le->current[Y] < Le->end[Y]) && (Re->current[Y] < Re->end[Y])){
 		/*span the scanline*/
-		span(render, Le, Re);
+		span(render, Le, Re, face);
 		/* next scan line */
 		edgeAdvanceDel(Le, 1);
 		edgeAdvanceDel(Re, 1);
@@ -605,7 +609,7 @@ void edgeAdvanceDel(GzEdge *e, float delY){
 	e->currentTex[V] += e->slopeTex[V]*delY;
 }
 
-void span(GzRender *render, GzEdge *le, GzEdge *re){
+void span(GzRender *render, GzEdge *le, GzEdge *re, int face){
 	/*
 	- Run from left to right for the scan line
 	- Call GzPutDisplay to set-up every pixel
@@ -763,6 +767,7 @@ void span(GzRender *render, GzEdge *le, GzEdge *re){
 								v = abs(1-v);						
 							}else{
 								v = abs(1-v);
+								u = abs(1-u);
 							}
 							
 						}else{
