@@ -4,13 +4,13 @@
 #include	"math.h"
 #include	"Gz.h"
 
-GzColor	*image=NULL;
+GzColor	*imageBG[6];//=NULL;
 int xs, ys;
 int reset = 1;
 float N=1;
 
 /* Image texture function */
-int tex_fun(float u, float v, GzColor color)
+int tex_fun(float u, float v, GzColor color, int bgface)
 {
   unsigned char		pixel[3];
   unsigned char     dummy;
@@ -19,27 +19,32 @@ int tex_fun(float u, float v, GzColor color)
   FILE			*fd;
 
   if (reset) {          /* open and load texture file */
-    fd = fopen ("texture", "rb");
-    if (fd == NULL) {
-      fprintf (stderr, "texture file not found\n");
-      exit(-1);
-    }
-    fscanf (fd, "%s %d %d %c", foo, &xs, &ys, &dummy);
-    image = (GzColor*)malloc(sizeof(GzColor)*(xs+1)*(ys+1));
-    if (image == NULL) {
-      fprintf (stderr, "malloc for texture image failed\n");
-      exit(-1);
-    }
+	for(int countBG=0; countBG < 6; countBG++){
+		char filein[20];
+		sprintf(filein,"cubemap/x%d.ppm",countBG);
+		fd = fopen (filein, "rb");
+		if (fd == NULL) {
+		  fprintf (stderr, "texture file not found\n");
+		  exit(-1);
+		}
+		fscanf (fd, "%s %d %d %c", foo, &xs, &ys, &dummy);
+		imageBG[countBG] = (GzColor*)malloc(sizeof(GzColor)*(xs+1)*(ys+1));
 
-    for (i = 0; i < xs*ys; i++) {	/* create array of GzColor values */
-      fread(pixel, sizeof(pixel), 1, fd);
-      image[i][RED] = (float)((int)pixel[RED]) * (1.0 / 255.0);
-      image[i][GREEN] = (float)((int)pixel[GREEN]) * (1.0 / 255.0);
-      image[i][BLUE] = (float)((int)pixel[BLUE]) * (1.0 / 255.0);
-      }
+		if (imageBG[countBG] == NULL) {
+		  fprintf (stderr, "malloc for texture image failed\n");
+		  exit(-1);
+		}
 
+		for (i = 0; i < xs*ys; i++) {	/* create array of GzColor values */
+		  fread(pixel, sizeof(pixel), 1, fd);
+		  imageBG[countBG][i][RED] = (float)((int)pixel[RED]) * (1.0 / 255.0);
+		  imageBG[countBG][i][GREEN] = (float)((int)pixel[GREEN]) * (1.0 / 255.0);
+		  imageBG[countBG][i][BLUE] = (float)((int)pixel[BLUE]) * (1.0 / 255.0);
+		}
+		fclose(fd);
+	}
     reset = 0;          /* init is done */
-	fclose(fd);
+	
   }
 
 /* bounds-test u,v to make sure nothing will overflow image array bounds */
@@ -48,7 +53,7 @@ int tex_fun(float u, float v, GzColor color)
 /* bounds-test u,v to make sure nothing will overflow image array bounds */
 	if (u>1.0) u = u - floor(u); 
 	else if (u<0) u = 1 - ceil(u) + u;
-	if (v>1.0) v -= v - floor(v); 
+	if (v>1.0) v = v - floor(v); 
 	else if (v<0) v = 1 - ceil(v) + v;
 
 	GzTextureIndex tex;
@@ -63,10 +68,10 @@ int tex_fun(float u, float v, GzColor color)
 
 	for (int i=0; i<3; i++){
 		color[i] = 
-			image[ texU    + texV   *xs][i] * (1-s)*(1-t) +
-			image[(texU+1) + texV   *xs][i] *    s *(1-t) +
-			image[(texU+1) +(texV+1)*xs][i] *    s * t    +
-			image[ texU    +(texV+1)*xs][i] * (1-s)* t;
+			imageBG[bgface][ texU    + texV   *xs][i] * (1-s)*(1-t) +
+			imageBG[bgface][(texU+1) + texV   *xs][i] *    s *(1-t) +
+			imageBG[bgface][(texU+1) +(texV+1)*xs][i] *    s * t    +
+			imageBG[bgface][ texU    +(texV+1)*xs][i] * (1-s)* t;
 	}
   
   return GZ_SUCCESS;
@@ -136,8 +141,12 @@ int ptex_fun(float u, float v, GzColor color)
 /* Free texture memory */
 int GzFreeTexture()
 {
-	if(image!=NULL)
-		free(image);
+	for(int i=0;i<6;i++){
+		if(imageBG[i]!=NULL){
+			free(imageBG[i]);
+			imageBG[i]=NULL;
+		}
+	}
 	return GZ_SUCCESS;
 }
 

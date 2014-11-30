@@ -19,11 +19,11 @@ static char THIS_FILE[]=__FILE__;
 #define new DEBUG_NEW
 #endif
 
-#define INFILE  "sphere.asc"
+#define INFILE  "cube.asc"
 #define OUTFILE "output.ppm"
 
 
-extern int tex_fun(float u, float v, GzColor color); /* image texture function */
+extern int tex_fun(float u, float v, GzColor color, int bgface); /* image texture function */
 extern int ptex_fun(float u, float v, GzColor color); /* procedural texture function */
 
 void shade(GzCoord norm, GzCoord color);
@@ -72,9 +72,9 @@ int Application5::Initialize()
 /* Translation matrix */
 GzMatrix	scale = 
 { 
-	1,	0.0,	0.0,	0.0, 
-	0.0,	1,	0.0,	0.0, 
-	0.0,	0.0,	1,	0.0, 
+	0.5,	0.0,	0.0,	0.0, 
+	0.0,	0.5,	0.0,	0.0, 
+	0.0,	0.0,	0.5,	0.0, 
 	0.0,	0.0,	0.0,	1.0 
 }; 
  
@@ -107,9 +107,9 @@ GzMatrix	rotateY =
 
 	
 	/* set up a app-defined camera */
-    camera.position[X] = 1.4142;
-    camera.position[Y] = -1.4142;
-    camera.position[Z] = 0;//-1.4142;
+    camera.position[X] = RADIUS;
+    camera.position[Y] = 0;
+    camera.position[Z] = 0;
 
     camera.lookat[X] = 0;
     camera.lookat[Y] = 0;
@@ -157,7 +157,7 @@ GzMatrix	rotateY =
 	* Select either GZ_COLOR or GZ_NORMALS as interpolation mode  
 	*/
 	nameListShader[1]  = GZ_INTERPOLATE;
-	interpStyle = GZ_NORMALS;         /* Phong shading */
+	interpStyle = GZ_SKYBOX;// GZ_NORMALS;         /* Phong shading */
 	valueListShader[1] = (GzPointer)&interpStyle;
 	nameListShader[2]  = GZ_AMBIENT_COEFFICIENT;
 	valueListShader[2] = (GzPointer)ambientCoefficient;
@@ -167,7 +167,7 @@ GzMatrix	rotateY =
 	specpower = 32;
 	valueListShader[4] = (GzPointer)&specpower;
 	nameListShader[5]  = GZ_TEXTURE_MAP;
-#if 1   /* set up null texture function or valid pointer */
+#if 0   /* set up null texture function or valid pointer */
 	valueListShader[5] = (GzPointer)0;
 #else
 	valueListShader[5] = (GzPointer)(tex_fun);	/* or use ptex_fun */
@@ -220,14 +220,14 @@ GzMatrix	rotateY =
 
 int Application5::Render() 
 {
-	GzToken		nameListTriangle[3]; 	/* vertex attribute names */
-	GzPointer	valueListTriangle[3]; 	/* vertex attribute pointers */
+	GzToken		nameListTriangle[4]; 	/* vertex attribute names */
+	GzPointer	valueListTriangle[4]; 	/* vertex attribute pointers */
 	GzCoord		vertexList[3];	/* vertex position coordinates */ 
 	GzCoord		normalList[3];	/* vertex normals */ 
 	GzTextureIndex  	uvList[3];		/* vertex texture map indices */ 
 	char		dummy[256]; 
 	int			status; 
-
+	int			face;
 
 	/* Initialize Display */
 	for(int i=0;i<AAKERNEL_SIZE;i++)
@@ -239,7 +239,7 @@ int Application5::Render()
 	nameListTriangle[0] = GZ_POSITION; 
 	nameListTriangle[1] = GZ_NORMAL; 
 	nameListTriangle[2] = GZ_TEXTURE_INDEX;  
-
+	nameListTriangle[3] = GZ_FACE;
 	// I/O File open
 	FILE *infile;
 	if( (infile  = fopen( INFILE , "r" )) == NULL )
@@ -259,28 +259,35 @@ int Application5::Render()
 	* Walk through the list of triangles, set color 
 	* and render each triangle 
 	*/ 
-	int count=0;
-	while( fscanf(infile, "%s", dummy) == 1 && count <1000) { 	/* read in tri word */
-		count++;
+	bool skybox=true;
+	while( fscanf(infile, "%s", dummy) == 1) { 	/* read in tri word */
 	    fscanf(infile, "%f %f %f %f %f %f %f %f", 
 		&(vertexList[0][0]), &(vertexList[0][1]),  
 		&(vertexList[0][2]), 
 		&(normalList[0][0]), &(normalList[0][1]), 	
 		&(normalList[0][2]), 
 		&(uvList[0][0]), &(uvList[0][1]) ); 
+		if(skybox){
+			fscanf(infile,"%d",&face);
+		}
 	    fscanf(infile, "%f %f %f %f %f %f %f %f", 
 		&(vertexList[1][0]), &(vertexList[1][1]), 	
 		&(vertexList[1][2]), 
 		&(normalList[1][0]), &(normalList[1][1]), 	
 		&(normalList[1][2]), 
 		&(uvList[1][0]), &(uvList[1][1]) ); 
+		if(skybox){
+			fscanf(infile,"%d",&face);
+		}
 	    fscanf(infile, "%f %f %f %f %f %f %f %f", 
 		&(vertexList[2][0]), &(vertexList[2][1]), 	
 		&(vertexList[2][2]), 
 		&(normalList[2][0]), &(normalList[2][1]), 	
 		&(normalList[2][2]), 
 		&(uvList[2][0]), &(uvList[2][1]) ); 
-
+		if(skybox){
+			fscanf(infile,"%d",&face);
+		}
 	    /* 
 	     * Set the value pointers to the first vertex of the 	
 	     * triangle, then feed it to the renderer 
@@ -289,8 +296,11 @@ int Application5::Render()
 	     valueListTriangle[0] = (GzPointer)vertexList; 
 		 valueListTriangle[1] = (GzPointer)normalList; 
 		 valueListTriangle[2] = (GzPointer)uvList; 
+		 if(skybox){
+			valueListTriangle[3] = (GzPointer)&face; 
+		}
 		for(int i=0;i<AAKERNEL_SIZE;i++)
-			 GzPutTriangle(m_pRender[i], 3, nameListTriangle, valueListTriangle); 
+			 GzPutTriangle(m_pRender[i], (skybox)?4:3, nameListTriangle, valueListTriangle); 
 	}
 	
 	for(int j=0;j<m_pDisplay[0]->xres*m_pDisplay[0]->yres;j++){

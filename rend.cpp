@@ -441,11 +441,11 @@ int GzPutTriangle(GzRender	*render, int numParts, GzToken *nameList, GzPointer	*
 				unitVector(planN);
 				shade(render,planN,render->flatcolor);
 			}
-			status |=Xform(render->Ximage[render->matlevel-1],vertexList[0]);
-			status |=Xform(render->Ximage[render->matlevel-1],vertexList[1]);
-			status |=Xform(render->Ximage[render->matlevel-1],vertexList[2]);
+			int status1; status1 = Xform(render->Ximage[render->matlevel-1],vertexList[0]);
+			int status2; status2 = Xform(render->Ximage[render->matlevel-1],vertexList[1]);
+			int status3; status3 = Xform(render->Ximage[render->matlevel-1],vertexList[2]);
 			
-			
+			status |= status1 && status2 && status3; 
 			// Sub-sample Offset default=0
 			for(int j=0;j<3;j++){
 				vertexList[j][X]-=render->dx;
@@ -472,7 +472,7 @@ int GzPutTriangle(GzRender	*render, int numParts, GzToken *nameList, GzPointer	*
 	if (status) 
 		return GZ_SUCCESS;
 	else{
-		GzScanLine(render, vertexList, normList, texureList, face);
+		GzScanLine(render, vertexList, normList, texureList, face); //Start
 	}
 	return GZ_SUCCESS;
 }
@@ -508,7 +508,7 @@ short	ctoi(float color)		/* convert float color to GzIntensity short */
   return(short)((int)(color * ((1 << 12) - 1)));
 }
 
-void GzScanLine(GzRender *render, GzCoord *vertexList, GzCoord *normList, GzTextureIndex* textureList, int face){
+void GzScanLine(GzRender *render, GzCoord *vertexList, GzCoord *normList, GzTextureIndex* textureList, int bgface){
 	
 	sortV(vertexList, normList, textureList);
 	warpTex(vertexList, textureList);
@@ -544,7 +544,7 @@ void GzScanLine(GzRender *render, GzCoord *vertexList, GzCoord *normList, GzText
 		edgeAdvanceDel(Re, delY_R);
 
 		/* Advance toward the lower end of first two edges */
-		edgeAdvance(render, Le, Re, face);
+		edgeAdvance(render, Le, Re, bgface);
 	}
 
 	/*--------------------------------------------------------------------------
@@ -578,7 +578,7 @@ void GzScanLine(GzRender *render, GzCoord *vertexList, GzCoord *normList, GzText
 		}
 
 		/* Advance toward the end of the edges, vertex 3 */
-		edgeAdvance(render, Le, Re, face);
+		edgeAdvance(render, Le, Re, bgface);
 	}
 }
 
@@ -586,11 +586,11 @@ void GzScanLine(GzRender *render, GzCoord *vertexList, GzCoord *normList, GzText
 	advance two edges toward the end vertext of two edges
 	and span each scanline in the between
 */
-void edgeAdvance(GzRender *render, GzEdge *Le, GzEdge *Re, int face){
+void edgeAdvance(GzRender *render, GzEdge *Le, GzEdge *Re, int bgface){
 
 	while((Le->current[Y] < Le->end[Y]) && (Re->current[Y] < Re->end[Y])){
 		/*span the scanline*/
-		span(render, Le, Re, face);
+		span(render, Le, Re, bgface);
 		/* next scan line */
 		edgeAdvanceDel(Le, 1);
 		edgeAdvanceDel(Re, 1);
@@ -609,7 +609,7 @@ void edgeAdvanceDel(GzEdge *e, float delY){
 	e->currentTex[V] += e->slopeTex[V]*delY;
 }
 
-void span(GzRender *render, GzEdge *le, GzEdge *re, int face){
+void span(GzRender *render, GzEdge *le, GzEdge *re, int bgface){
 	/*
 	- Run from left to right for the scan line
 	- Call GzPutDisplay to set-up every pixel
@@ -701,11 +701,11 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int face){
 					if(render->tex_fun!=NULL){
 						memcpy(unWarpedTex,currentTex,sizeof(GzTextureIndex));
 						unWarpTex(current,unWarpedTex);
-						render->tex_fun(unWarpedTex[U],unWarpedTex[V],col);
+						render->tex_fun(unWarpedTex[U],unWarpedTex[V],col,bgface);
 						memcpy(render->Kd,col,sizeof(GzColor));
 						memcpy(render->Ka,col,sizeof(GzColor));
 					}
-
+#if 0
 					/********************************************
 						    CubeMap Lookup - Reflected face
 					*********************************************/
@@ -837,7 +837,7 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int face){
 					}
 					/*******************************************/
 					//shade(render,currentIntrp,col);
-					
+#endif		
 					GzPutDisplay(render->display, (int)current[X],(int)current[Y],
 						ctoi( col[RED]),
 						ctoi( col[GREEN]),
@@ -851,7 +851,7 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int face){
 						GzColor Kt;
 						memcpy(unWarpedTex,currentTex,sizeof(GzTextureIndex));
 						unWarpTex(current,unWarpedTex);
-						render->tex_fun(unWarpedTex[U],unWarpedTex[V],Kt);
+						render->tex_fun(unWarpedTex[U],unWarpedTex[V],Kt,bgface);
 						intrpedCol[RED] = Kt[RED]*currentIntrp[RED];
 						intrpedCol[GREEN] = Kt[GREEN]*currentIntrp[GREEN];
 						intrpedCol[BLUE] = Kt[BLUE]*currentIntrp[BLUE];
@@ -865,6 +865,23 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int face){
 						ctoi( intrpedCol[RED]),
 						ctoi( intrpedCol[GREEN]),
 						ctoi( intrpedCol[BLUE]),
+						0,
+						(GzDepth)current[Z]);
+					break;
+				case GZ_SKYBOX:
+					//GzColor intrpedCol;
+					GzColor Kt;
+					if(render->tex_fun!=NULL){
+						memcpy(unWarpedTex,currentTex,sizeof(GzTextureIndex));
+						unWarpTex(current,unWarpedTex);
+						render->tex_fun(unWarpedTex[U],unWarpedTex[V],Kt,bgface);
+					}else{
+						memcpy(intrpedCol,currentIntrp,sizeof(GzColor));
+					}
+					GzPutDisplay(render->display, (int)current[X],(int)current[Y],
+						ctoi( Kt[RED]),
+						ctoi( Kt[GREEN]),
+						ctoi( Kt[BLUE]),
 						0,
 						(GzDepth)current[Z]);
 					break;

@@ -8,7 +8,7 @@
 #define GZ_SUCCESS      0
 #define GZ_FAILURE      1
 
-#define RADIUS 3;
+#define RADIUS 0.01;
 
 #define PI 3.14159265
 /*
@@ -48,6 +48,7 @@
 #define GZ_FLAT		0	/* flat shading with GZ_RBG_COLOR */
 #define	GZ_COLOR	  1	/* interpolate vertex color */
 #define	GZ_NORMALS	  2	/* interpolate normals */
+#define GZ_SKYBOX 3
 
 typedef int     GzToken;
 typedef void    *GzPointer;
@@ -58,7 +59,7 @@ typedef float   GzTextureIndex[2];
 typedef float   GzMatrix[4][4];
 typedef int	GzDepth;		/* z is signed for clipping */
 
-typedef	int	(*GzTexture)(float u, float v, GzColor color);	/* pointer to texture sampling method */
+typedef	int	(*GzTexture)(float u, float v, GzColor color, int bgface);	/* pointer to texture sampling method */
 /* u,v parameters [0,1] are defined tex_fun(float u, float v, GzColor color) */
 
 /*
