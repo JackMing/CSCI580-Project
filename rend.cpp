@@ -790,7 +790,7 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int face){
 						for(int i=0;i<6;i++){
 							FILE *fd;
 							char filein[20];
-							sprintf(filein,"cubemap/test%d.ppm",i);
+							sprintf(filein,"cubemap/sky%d.ppm",i);
 							fd = fopen(filein,"rb");
 							if (fd == NULL) {
 								fprintf (stderr, "texture file not found\n");
