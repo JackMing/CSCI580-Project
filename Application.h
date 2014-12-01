@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#define	AAKERNEL_SIZE	6
+#define	AAKERNEL_SIZE	1
 
 #include "Gz.h"
 #include "disp.h"

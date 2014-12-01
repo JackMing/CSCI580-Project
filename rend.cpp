@@ -212,7 +212,7 @@ int GzBeginRender(GzRender *render)
 	up[X] = render->camera.worldup[X];
 	up[Y] = render->camera.worldup[Y];
 	up[Z] = render->camera.worldup[Z];
-
+	unitVector(up);
 	float dot = dotProduct(vZ,up);
 	
 	vY[X] = up[X]-dot*vZ[X];
@@ -264,6 +264,8 @@ int GzBeginRender(GzRender *render)
 	render->camera.Xwi[Y][3] = 0;
 	render->camera.Xwi[Z][3] = 0;
 	render->camera.Xwi[3][3] = 1;
+
+	matrixUnitary(render->camera.Xwi);
 
 	GzPushMatrix(render,render->Xsp);
 	GzPushMatrix(render,render->camera.Xpi);
@@ -381,12 +383,6 @@ int GzPutAttribute(GzRender	*render, int numAttributes, GzToken	*nameList,
 		case GZ_AASHIFTY:
 			render->dy = *(float*)valueList[i];
 			break;
-		case GZ_CAMERAPHI:
-			render->phi = *(float*)valueList[i];
-			break;
-		case GZ_CAMERAXITA:
-			render->xita = *(float*)valueList[i];
-			break;
 		default:
 			return GZ_FAILURE;
 		}
@@ -444,8 +440,10 @@ int GzPutTriangle(GzRender	*render, int numParts, GzToken *nameList, GzPointer	*
 			int status1; status1 = Xform(render->Ximage[render->matlevel-1],vertexList[0]);
 			int status2; status2 = Xform(render->Ximage[render->matlevel-1],vertexList[1]);
 			int status3; status3 = Xform(render->Ximage[render->matlevel-1],vertexList[2]);
-			
 			status |= status1 && status2 && status3; 
+			//status |= Xform(render->Ximage[render->matlevel-1],vertexList[0]);
+			//status |= Xform(render->Ximage[render->matlevel-1],vertexList[1]);
+			//status |= Xform(render->Ximage[render->matlevel-1],vertexList[2]);
 			// Sub-sample Offset default=0
 			for(int j=0;j<3;j++){
 				vertexList[j][X]-=render->dx;
@@ -705,7 +703,7 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int bgface){
 						memcpy(render->Kd,col,sizeof(GzColor));
 						memcpy(render->Ka,col,sizeof(GzColor));
 					}
-#if 0
+#if 1
 					/********************************************
 						    CubeMap Lookup - Reflected face
 					*********************************************/
@@ -790,7 +788,7 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int bgface){
 						for(int i=0;i<6;i++){
 							FILE *fd;
 							char filein[20];
-							sprintf(filein,"cubemap/sky%d.ppm",i);
+							sprintf(filein,"cubemap/x%d.ppm",i);
 							fd = fopen(filein,"rb");
 							if (fd == NULL) {
 								fprintf (stderr, "texture file not found\n");

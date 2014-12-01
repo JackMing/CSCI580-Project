@@ -32,7 +32,6 @@ typedef struct {			/* define a renderer */
   float		    spec;		/* specular power */
   GzTexture		tex_fun;    /* tex_fun(float u, float v, GzColor color) */
   float			dx,dy;
-  float			phi,xita;	/*for camera rotation in project*/
 }  GzRender;
 #endif
 

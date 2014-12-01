@@ -28,6 +28,7 @@ public:
 	void DrawFrameBuffer(CDC *pDC);
 private:
 	int Xform_view(GzMatrix mat, GzCoord vec);
+	void unitVector(GzCoord);
 // Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CCS580HWView)

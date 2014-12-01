@@ -28,12 +28,15 @@ extern int ptex_fun(float u, float v, GzColor color); /* procedural texture func
 
 void shade(GzCoord norm, GzCoord color);
 
-float AAFilter[AAKERNEL_SIZE][3] =		/* X-shift, Y-shift, weight */
-{
--0.52, 0.38, 0.128, 		0.41, 0.56, 0.119,		0.27, 0.08, 0.294,
+//float AAFilter[6][3] =		/* X-shift, Y-shift, weight */
+//{
+//-0.52, 0.38, 0.128, 		0.41, 0.56, 0.119,		0.27, 0.08, 0.294,
+//-0.17, -0.29, 0.249,		0.58, -0.55, 0.104,		-0.31, -0.71, 0.106
+//};
+float AAFilter[6][3] = {
+1, 1, 1, 		0.41, 0.56, 0.119,		0.27, 0.08, 0.294,
 -0.17, -0.29, 0.249,		0.58, -0.55, 0.104,		-0.31, -0.71, 0.106
 };
-
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -59,8 +62,6 @@ int Application5::Initialize()
 	GzPointer   valueListLights[10];
 	GzToken		nameListSample[2];
 	GzPointer	valueListSample[2];
-	GzToken		nameListRotate[2];
-	GzPointer	valueListRotate[2];
 	int			shaderType, interpStyle;
 	float		specpower;
 	int		status; 
@@ -107,7 +108,7 @@ GzMatrix	rotateY =
 
 	
 	/* set up a app-defined camera */
-    camera.position[X] = RADIUS;
+    camera.position[X] = -0.2;
     camera.position[Y] = 0;
     camera.position[Z] = 0;
 
@@ -116,8 +117,8 @@ GzMatrix	rotateY =
     camera.lookat[Z] = 0;
 
     camera.worldup[X] = 0.0;
-    camera.worldup[Y] = 1.0;
-    camera.worldup[Z] = 0.0;
+    camera.worldup[Y] = 0.0;
+    camera.worldup[Z] = 1.0;
 
     camera.FOV = 63.7; /* degree */
 
@@ -172,14 +173,15 @@ GzMatrix	rotateY =
 #else
 	valueListShader[5] = (GzPointer)(tex_fun);	/* or use ptex_fun */
 #endif
+
+
+
 	status |= GzNewFrameBuffer(&m_pFrameBuffer, m_nWidth, m_nHeight);
 
 	for(int sampleNum = 0; sampleNum < AAKERNEL_SIZE; sampleNum++){		
 
 		status |= GzNewDisplay(&m_pDisplay[sampleNum], m_nWidth, m_nHeight);
-
 		status |= GzGetDisplayParams(m_pDisplay[sampleNum], &xRes, &yRes); 
-
 		status |= GzNewRender(&m_pRender[sampleNum], m_pDisplay[sampleNum]); 
 
 #if 1 	/* set up app-defined camera if desired, else use camera defaults */
@@ -196,16 +198,8 @@ GzMatrix	rotateY =
 		status |= GzPutAttribute(m_pRender[sampleNum], 4, nameListLights, valueListLights);
 		status |= GzPutAttribute(m_pRender[sampleNum], 6, nameListShader, valueListShader);
 		status |= GzPutAttribute(m_pRender[sampleNum], 2, nameListSample, valueListSample);
-		//put camera rotation phi and xita
-		float start_phi_degree = 0;
-		float start_xita_degree = 90;
-		nameListRotate[0] = GZ_CAMERAPHI;
-		valueListRotate[0] = (GzPointer)&start_phi_degree;
-		nameListRotate[1] = GZ_CAMERAXITA;
-		valueListRotate[1] = (GzPointer)&start_xita_degree;
-		status |= GzPutAttribute(m_pRender[sampleNum], 2, nameListRotate, valueListRotate);
 
-		status |= GzPushMatrix(m_pRender[sampleNum], scale);  
+		//status |= GzPushMatrix(m_pRender[sampleNum], scale);  
 		//status |= GzPushMatrix(m_pRender[sampleNum], rotateY); 
 		//status |= GzPushMatrix(m_pRender[sampleNum], rotateX); 
 	}
@@ -222,6 +216,8 @@ int Application5::Render()
 {
 	GzToken		nameListTriangle[4]; 	/* vertex attribute names */
 	GzPointer	valueListTriangle[4]; 	/* vertex attribute pointers */
+	GzToken		nameListShader[2]; 	/* vertex attribute names */
+	GzPointer	valueListShader[2]; 	/* vertex attribute pointers */
 	GzCoord		vertexList[3];	/* vertex position coordinates */ 
 	GzCoord		normalList[3];	/* vertex normals */ 
 	GzTextureIndex  	uvList[3];		/* vertex texture map indices */ 
@@ -229,7 +225,20 @@ int Application5::Render()
 	int			status; 
 	int			face;
 
-	/* Initialize Display */
+GzMatrix	scale_sphere = 
+{ 
+	0.005,	0.0,	0.0,	0.0, 
+	0.0,	0.005,	0.0,	0.0, 
+	0.0,	0.0,	0.005,	0.0, 
+	0.0,	0.0,	0.0,	1.0 
+}; 
+GzMatrix	scale_cube = 
+{ 
+	1.5,	0.0,	0.0,	0.0, 
+	0.0,	1.5,	0.0,	0.0, 
+	0.0,	0.0,	1.5,	0.0, 
+	0.0,	0.0,	0.0,	1.0 
+}; 	/* Initialize Display */
 	for(int i=0;i<AAKERNEL_SIZE;i++)
 		status |= GzInitDisplay(m_pDisplay[i]); 
 	
@@ -248,6 +257,13 @@ int Application5::Render()
 		 return GZ_FAILURE;
 	}
 
+	FILE *infile2;
+	if( (infile2  = fopen( "sphere_new.asc" , "r" )) == NULL )
+	{
+         AfxMessageBox( "The input file was not opened\n" );
+		 return GZ_FAILURE;
+	}
+
 	FILE *outfile;
 	if( (outfile  = fopen( OUTFILE , "wb" )) == NULL )
 	{
@@ -258,8 +274,17 @@ int Application5::Render()
 	/* 
 	* Walk through the list of triangles, set color 
 	* and render each triangle 
-	*/ 
+	*/
 	bool skybox=true;
+	nameListShader[0]  = GZ_INTERPOLATE;
+	int interpStyle = GZ_SKYBOX;// GZ_NORMALS;         /* Phong shading */
+	valueListShader[0] = (GzPointer)&interpStyle;
+	nameListShader[1]  = GZ_TEXTURE_MAP;
+	valueListShader[1] = (GzPointer)tex_fun;
+	for(int i=0;i<AAKERNEL_SIZE;i++){
+		GzPutAttribute(m_pRender[i], 2, nameListShader, valueListShader);
+		GzPushMatrix(m_pRender[i], scale_cube); 
+	}
 	while( fscanf(infile, "%s", dummy) == 1) { 	/* read in tri word */
 	    fscanf(infile, "%f %f %f %f %f %f %f %f", 
 		&(vertexList[0][0]), &(vertexList[0][1]),  
@@ -303,6 +328,56 @@ int Application5::Render()
 			 GzPutTriangle(m_pRender[i], (skybox)?4:3, nameListTriangle, valueListTriangle); 
 	}
 	
+	skybox=false;
+	nameListShader[0]  = GZ_INTERPOLATE;
+	interpStyle = GZ_NORMALS;// GZ_NORMALS;         /* Phong shading */
+	valueListShader[0] = (GzPointer)&interpStyle;
+	nameListShader[1]  = GZ_TEXTURE_MAP;
+	valueListShader[1] = (GzPointer)0;
+	for(int i=0;i<AAKERNEL_SIZE;i++){
+		GzPutAttribute(m_pRender[i], 2, nameListShader, valueListShader);
+		GzPopMatrix(m_pRender[i]);
+		GzPushMatrix(m_pRender[i], scale_sphere); 
+	}
+	while( fscanf(infile2, "%s", dummy) == 1) { 	/* read in tri word */
+	    fscanf(infile2, "%f %f %f %f %f %f %f %f", 
+		&(vertexList[0][0]), &(vertexList[0][1]),  
+		&(vertexList[0][2]), 
+		&(normalList[0][0]), &(normalList[0][1]), 	
+		&(normalList[0][2]), 
+		&(uvList[0][0]), &(uvList[0][1]) ); 
+
+	    fscanf(infile2, "%f %f %f %f %f %f %f %f", 
+		&(vertexList[1][0]), &(vertexList[1][1]), 	
+		&(vertexList[1][2]), 
+		&(normalList[1][0]), &(normalList[1][1]), 	
+		&(normalList[1][2]), 
+		&(uvList[1][0]), &(uvList[1][1]) ); 
+
+	    fscanf(infile2, "%f %f %f %f %f %f %f %f", 
+		&(vertexList[2][0]), &(vertexList[2][1]), 	
+		&(vertexList[2][2]), 
+		&(normalList[2][0]), &(normalList[2][1]), 	
+		&(normalList[2][2]), 
+		&(uvList[2][0]), &(uvList[2][1]) ); 
+
+	    /* 
+	     * Set the value pointers to the first vertex of the 	
+	     * triangle, then feed it to the renderer 
+	     * NOTE: this sequence matches the nameList token sequence
+	     */ 
+	     valueListTriangle[0] = (GzPointer)vertexList; 
+		 valueListTriangle[1] = (GzPointer)normalList; 
+		 valueListTriangle[2] = (GzPointer)uvList; 
+		 if(skybox){
+			valueListTriangle[3] = (GzPointer)&face; 
+		}
+		for(int i=0;i<AAKERNEL_SIZE;i++)
+			 GzPutTriangle(m_pRender[i], (skybox)?4:3, nameListTriangle, valueListTriangle); 
+	}
+
+
+
 	for(int j=0;j<m_pDisplay[0]->xres*m_pDisplay[0]->yres;j++){
 		m_pDisplay[0]->fbuf[j].red *= AAFilter[0][2];
 		m_pDisplay[0]->fbuf[j].green *= AAFilter[0][2];
@@ -324,6 +399,9 @@ int Application5::Render()
 	 */ 
 
 	if( fclose( infile ) )
+      AfxMessageBox( "The input file was not closed\n" );
+
+	if( fclose( infile2 ) )
       AfxMessageBox( "The input file was not closed\n" );
 
 	if( fclose( outfile ) )

@@ -13,7 +13,7 @@
 #include "disp.h"
 #include "Application5.h"
 
-#define THETA 5
+#define THETA 5.0
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -120,7 +120,7 @@ void CCS580HWView::OnRender()
 	x_offset = windowRect.Width() - clientRect.Width();
 	y_offset = windowRect.Height() - clientRect.Height();
 
-	//AfxGetMainWnd()->SetWindowPos(NULL, 0, 0, x_offset+m_pApplication->m_nWidth, y_offset+m_pApplication->m_nHeight, NULL/*,SWP_SHOWWINDOW*/);
+	AfxGetMainWnd()->SetWindowPos(NULL, 0, 0, x_offset+m_pApplication->m_nWidth, y_offset+m_pApplication->m_nHeight, NULL/*,SWP_SHOWWINDOW*/);
 
 	Invalidate(true);	
 }
@@ -340,37 +340,24 @@ LRESULT CCS580HWView::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				GzCoord v = {0,1,0};
 				Xform_view(m_pApplication->m_pRender[i]->camera.Xwi,v);
-				GzMatrix R = {v[0]*v[0]+(1-v[0]*v[0])*cos(-THETA*PI/180), 
-							v[0]*v[1]*(1-cos(-THETA*PI/180))-v[2]*sin(-THETA*PI/180),
-							v[0]*v[2]*(1-cos(-THETA*PI/180))+v[1]*sin(-THETA*PI/180),
+				unitVector(v);
+				GzMatrix R = {v[0]*v[0]+(1-v[0]*v[0])*cos(-THETA*PI/180.0), 
+							v[0]*v[1]*(1-cos(-THETA*PI/180.0))-v[2]*sin(-THETA*PI/180.0),
+							v[0]*v[2]*(1-cos(-THETA*PI/180.0))+v[1]*sin(-THETA*PI/180.0),
 							0,
-							v[0]*v[1]*(1-cos(-THETA*PI/180))+v[2]*sin(-THETA*PI/180),
-							v[1]*v[1]+(1-v[1]*v[1])*cos(-THETA*PI/180), 
-							v[1]*v[2]*(1-cos(-THETA*PI/180))-v[0]*sin(-THETA*PI/180),
+							v[0]*v[1]*(1-cos(-THETA*PI/180.0))+v[2]*sin(-THETA*PI/180.0),
+							v[1]*v[1]+(1-v[1]*v[1])*cos(-THETA*PI/180.0), 
+							v[1]*v[2]*(1-cos(-THETA*PI/180.0))-v[0]*sin(-THETA*PI/180.0),
 							0,
-							v[0]*v[2]*(1-cos(-THETA*PI/180))-v[1]*sin(-THETA*PI/180),
-							v[1]*v[2]*(1-cos(-THETA*PI/180))+v[0]*sin(-THETA*PI/180),
-							v[2]*v[2]+(1-v[2]*v[2])*cos(-THETA*PI/180),
+							v[0]*v[2]*(1-cos(-THETA*PI/180.0))-v[1]*sin(-THETA*PI/180.0),
+							v[1]*v[2]*(1-cos(-THETA*PI/180.0))+v[0]*sin(-THETA*PI/180.0),
+							v[2]*v[2]+(1-v[2]*v[2])*cos(-THETA*PI/180.0),
 							0,
 							0,0,0,1
 							};
 				Xform_view(R,m_pApplication->m_pRender[i]->camera.position);
+				Xform_view(R,m_pApplication->m_pRender[i]->camera.worldup);
 				m_pApplication->m_pRender[i]->matlevel = 0;
-				//m_pApplication->m_pRender[i]->xita -= 10;
-				//check if xita is out of boundary
-				//if(m_pApplication->m_pRender[i]->xita <= 0)m_pApplication->m_pRender[i]->xita = 0;
-				//int phi_degree = m_pApplication->m_pRender[i]->phi;
-				//int xita_degree = m_pApplication->m_pRender[i]->xita;
-				//m_pApplication->m_pRender[i]->camera.position[0] = sin(xita_degree * PI/180) * cos(phi_degree * PI/180) * RADIUS;
-				//m_pApplication->m_pRender[i]->camera.position[1] = sin(phi_degree * PI/180) * sin(xita_degree * PI/180) * RADIUS;
-				//m_pApplication->m_pRender[i]->camera.position[2] = cos(xita * PI/180) * RADIUS;
-				//m_pApplication->m_pRender[i]->matlevel = 0;
-				//float vector[4] = {0.0, 0.2, 0.0, 0.0};
-				//Xform_view(m_pApplication->m_pRender[i]->camera.Xwi,vector);
-				//m_pApplication->m_pRender[i]->camera.position[0] += vector[0];
-				//m_pApplication->m_pRender[i]->camera.position[1] += vector[1];
-				//m_pApplication->m_pRender[i]->camera.position[2] += vector[2];
-				//m_pApplication->m_pRender[i]->matlevel = 0;
 				GzBeginRender(m_pApplication->m_pRender[i]);
 			}
 			this->OnRender();
@@ -383,37 +370,24 @@ LRESULT CCS580HWView::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				GzCoord v = {0,1,0};
 				Xform_view(m_pApplication->m_pRender[i]->camera.Xwi,v);
-				GzMatrix R = {v[0]*v[0]+(1-v[0]*v[0])*cos(THETA*PI/180), 
-							v[0]*v[1]*(1-cos(THETA*PI/180))-v[2]*sin(THETA*PI/180),
-							v[0]*v[2]*(1-cos(THETA*PI/180))+v[1]*sin(THETA*PI/180),
+				unitVector(v);
+				GzMatrix R = {v[0]*v[0]+(1-v[0]*v[0])*cos(THETA*PI/180.0), 
+							v[0]*v[1]*(1-cos(THETA*PI/180.0))-v[2]*sin(THETA*PI/180.0),
+							v[0]*v[2]*(1-cos(THETA*PI/180.0))+v[1]*sin(THETA*PI/180.0),
 							0,
-							v[0]*v[1]*(1-cos(THETA*PI/180))+v[2]*sin(THETA*PI/180),
-							v[1]*v[1]+(1-v[1]*v[1])*cos(THETA*PI/180), 
-							v[1]*v[2]*(1-cos(THETA*PI/180))-v[0]*sin(THETA*PI/180),
+							v[0]*v[1]*(1-cos(THETA*PI/180.0))+v[2]*sin(THETA*PI/180.0),
+							v[1]*v[1]+(1-v[1]*v[1])*cos(THETA*PI/180.0), 
+							v[1]*v[2]*(1-cos(THETA*PI/180.0))-v[0]*sin(THETA*PI/180.0),
 							0,
-							v[0]*v[2]*(1-cos(THETA*PI/180))-v[1]*sin(THETA*PI/180),
-							v[1]*v[2]*(1-cos(THETA*PI/180))+v[0]*sin(THETA*PI/180),
-							v[2]*v[2]+(1-v[2]*v[2])*cos(THETA*PI/180),
+							v[0]*v[2]*(1-cos(THETA*PI/180.0))-v[1]*sin(THETA*PI/180.0),
+							v[1]*v[2]*(1-cos(THETA*PI/180.0))+v[0]*sin(THETA*PI/180.0),
+							v[2]*v[2]+(1-v[2]*v[2])*cos(THETA*PI/180.0),
 							0,
 							0,0,0,1
 							};
 				Xform_view(R,m_pApplication->m_pRender[i]->camera.position);
+				Xform_view(R,m_pApplication->m_pRender[i]->camera.worldup);
 				m_pApplication->m_pRender[i]->matlevel = 0;
-				//m_pApplication->m_pRender[i]->xita += 10;
-				//check if xita is out of boundary
-				//if(m_pApplication->m_pRender[i]->xita >= 180)m_pApplication->m_pRender[i]->xita = 180;
-				//int phi_degree = m_pApplication->m_pRender[i]->phi;
-				//int xita_degree = m_pApplication->m_pRender[i]->xita;
-				//m_pApplication->m_pRender[i]->camera.position[0] = sin(xita_degree * PI/180) * cos(phi_degree * PI/180) * RADIUS;
-				//m_pApplication->m_pRender[i]->camera.position[1] = sin(phi_degree * PI/180) * sin(xita_degree * PI/180) * RADIUS;
-				//m_pApplication->m_pRender[i]->camera.position[2] = cos(xita * PI/180) * RADIUS;
-				//m_pApplication->m_pRender[i]->matlevel = 0;
-				//float vector[4] = {0.0, -0.2, 0.0, 0.0};
-				//Xform_view(m_pApplication->m_pRender[i]->camera.Xwi,vector);
-				//m_pApplication->m_pRender[i]->camera.position[0] += vector[0];
-				//m_pApplication->m_pRender[i]->camera.position[1] += vector[1];
-				//m_pApplication->m_pRender[i]->camera.position[2] += vector[2];
-				//m_pApplication->m_pRender[i]->matlevel = 0;
 				GzBeginRender(m_pApplication->m_pRender[i]);
 			}
 			this->OnRender();
@@ -425,35 +399,24 @@ LRESULT CCS580HWView::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				GzCoord v = {1,0,0};
 				Xform_view(m_pApplication->m_pRender[i]->camera.Xwi,v);
-				GzMatrix R = {v[0]*v[0]+(1-v[0]*v[0])*cos(-THETA*PI/180), 
-							v[0]*v[1]*(1-cos(-THETA*PI/180))-v[2]*sin(-THETA*PI/180),
-							v[0]*v[2]*(1-cos(-THETA*PI/180))+v[1]*sin(-THETA*PI/180),
+				unitVector(v);
+				GzMatrix R = {v[0]*v[0]+(1-v[0]*v[0])*cos(-THETA*PI/180.0), 
+							v[0]*v[1]*(1-cos(-THETA*PI/180.0))-v[2]*sin(-THETA*PI/180.0),
+							v[0]*v[2]*(1-cos(-THETA*PI/180.0))+v[1]*sin(-THETA*PI/180.0),
 							0,
-							v[0]*v[1]*(1-cos(-THETA*PI/180))+v[2]*sin(-THETA*PI/180),
-							v[1]*v[1]+(1-v[1]*v[1])*cos(-THETA*PI/180), 
-							v[1]*v[2]*(1-cos(-THETA*PI/180))-v[0]*sin(-THETA*PI/180),
+							v[0]*v[1]*(1-cos(-THETA*PI/180.0))+v[2]*sin(-THETA*PI/180.0),
+							v[1]*v[1]+(1-v[1]*v[1])*cos(-THETA*PI/180.0), 
+							v[1]*v[2]*(1-cos(-THETA*PI/180.0))-v[0]*sin(-THETA*PI/180.0),
 							0,
-							v[0]*v[2]*(1-cos(-THETA*PI/180))-v[1]*sin(-THETA*PI/180),
-							v[1]*v[2]*(1-cos(-THETA*PI/180))+v[0]*sin(-THETA*PI/180),
-							v[2]*v[2]+(1-v[2]*v[2])*cos(-THETA*PI/180),
+							v[0]*v[2]*(1-cos(-THETA*PI/180.0))-v[1]*sin(-THETA*PI/180.0),
+							v[1]*v[2]*(1-cos(-THETA*PI/180.0))+v[0]*sin(-THETA*PI/180.0),
+							v[2]*v[2]+(1-v[2]*v[2])*cos(-THETA*PI/180.0),
 							0,
 							0,0,0,1
 							};
 				Xform_view(R,m_pApplication->m_pRender[i]->camera.position);
+				Xform_view(R,m_pApplication->m_pRender[i]->camera.worldup);
 				m_pApplication->m_pRender[i]->matlevel = 0;
-				//m_pApplication->m_pRender[i]->phi -= 10;
-				//int phi_degree = m_pApplication->m_pRender[i]->phi;
-				//int xita_degree = m_pApplication->m_pRender[i]->xita;
-				//m_pApplication->m_pRender[i]->camera.position[0] = sin(xita_degree * PI/180) * cos(phi_degree * PI/180) * RADIUS;
-				//m_pApplication->m_pRender[i]->camera.position[1] = sin(phi_degree * PI/180) * sin(xita_degree * PI/180) * RADIUS;
-				//m_pApplication->m_pRender[i]->camera.position[2] = cos(xita * PI/180) * RADIUS;
-				//m_pApplication->m_pRender[i]->matlevel = 0;
-				//float vector[4] = {-0.2, 0.0, 0.0, 0.0};
-				//Xform_view(m_pApplication->m_pRender[i]->camera.Xwi,vector);
-				//m_pApplication->m_pRender[i]->camera.position[0] += vector[0];
-				//m_pApplication->m_pRender[i]->camera.position[1] += vector[1];
-				//m_pApplication->m_pRender[i]->camera.position[2] += vector[2];
-				//m_pApplication->m_pRender[i]->matlevel = 0;
 				GzBeginRender(m_pApplication->m_pRender[i]);
 			}
 			this->OnRender();
@@ -465,35 +428,25 @@ LRESULT CCS580HWView::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				GzCoord v = {1,0,0};
 				Xform_view(m_pApplication->m_pRender[i]->camera.Xwi,v);
-				GzMatrix R = {v[0]*v[0]+(1-v[0]*v[0])*cos(THETA*PI/180), 
-							v[0]*v[1]*(1-cos(THETA*PI/180))-v[2]*sin(THETA*PI/180),
-							v[0]*v[2]*(1-cos(THETA*PI/180))+v[1]*sin(THETA*PI/180),
+				unitVector(v);
+				GzMatrix R = {v[0]*v[0]+(1-v[0]*v[0])*cos(THETA*PI/180.0), 
+							v[0]*v[1]*(1-cos(THETA*PI/180.0))-v[2]*sin(THETA*PI/180.0),
+							v[0]*v[2]*(1-cos(THETA*PI/180.0))+v[1]*sin(THETA*PI/180.0),
 							0,
-							v[0]*v[1]*(1-cos(THETA*PI/180))+v[2]*sin(THETA*PI/180),
-							v[1]*v[1]+(1-v[1]*v[1])*cos(THETA*PI/180), 
-							v[1]*v[2]*(1-cos(THETA*PI/180))-v[0]*sin(THETA*PI/180),
+							v[0]*v[1]*(1-cos(THETA*PI/180.0))+v[2]*sin(THETA*PI/180.0),
+							v[1]*v[1]+(1-v[1]*v[1])*cos(THETA*PI/180.0), 
+							v[1]*v[2]*(1-cos(THETA*PI/180.0))-v[0]*sin(THETA*PI/180.0),
 							0,
-							v[0]*v[2]*(1-cos(THETA*PI/180))-v[1]*sin(THETA*PI/180),
-							v[1]*v[2]*(1-cos(THETA*PI/180))+v[0]*sin(THETA*PI/180),
-							v[2]*v[2]+(1-v[2]*v[2])*cos(THETA*PI/180),
+							v[0]*v[2]*(1-cos(THETA*PI/180.0))-v[1]*sin(THETA*PI/180.0),
+							v[1]*v[2]*(1-cos(THETA*PI/180.0))+v[0]*sin(THETA*PI/180.0),
+							v[2]*v[2]+(1-v[2]*v[2])*cos(THETA*PI/180.0),
 							0,
 							0,0,0,1
 							};
+
 				Xform_view(R,m_pApplication->m_pRender[i]->camera.position);
+				Xform_view(R,m_pApplication->m_pRender[i]->camera.worldup);
 				m_pApplication->m_pRender[i]->matlevel = 0;
-				//m_pApplication->m_pRender[i]->phi += 10;
-				//int phi_degree = m_pApplication->m_pRender[i]->phi;
-				//int xita_degree = m_pApplication->m_pRender[i]->xita;
-				//m_pApplication->m_pRender[i]->camera.position[0] = sin(xita_degree * PI/180) * cos(phi_degree * PI/180) * RADIUS;
-				//m_pApplication->m_pRender[i]->camera.position[1] = sin(phi_degree * PI/180) * sin(xita_degree * PI/180) * RADIUS;
-				//m_pApplication->m_pRender[i]->camera.position[2] = cos(xita * PI/180) * RADIUS;
-				//m_pApplication->m_pRender[i]->matlevel = 0;
-				//float vector[4] = {0.2, 0.0, 0.0, 0.0};
-				//Xform_view(m_pApplication->m_pRender[i]->camera.Xwi,vector);
-				//m_pApplication->m_pRender[i]->camera.position[0] += vector[0];
-				//m_pApplication->m_pRender[i]->camera.position[1] += vector[1];
-				//m_pApplication->m_pRender[i]->camera.position[2] += vector[2];
-				//m_pApplication->m_pRender[i]->matlevel = 0;
 				GzBeginRender(m_pApplication->m_pRender[i]);
 			}
 			this->OnRender();
@@ -585,5 +538,12 @@ int CCS580HWView::Xform_view(GzMatrix mat, GzCoord vec){
 	if(after[2]<0)
 		return GZ_FAILURE;
 	return GZ_SUCCESS;
+}
+
+void CCS580HWView::unitVector(GzCoord v){
+	float det = sqrt(v[X]*v[X]+v[Y]*v[Y]+v[Z]*v[Z]);
+	v[X] /= det;
+	v[Y] /= det;
+	v[Z] /= det;
 }
 

@@ -8,7 +8,7 @@
 #define GZ_SUCCESS      0
 #define GZ_FAILURE      1
 
-#define RADIUS 0.01;
+#define RADIUS 1;
 
 #define PI 3.14159265
 /*
@@ -22,9 +22,6 @@
 
 #define	GZ_AASHIFTX	44	/* antialiasing screen offset */
 #define	GZ_AASHIFTY	45	/* antialiasing screen offset */
-
-#define	GZ_CAMERAPHI 50
-#define	GZ_CAMERAXITA 51
 
 /* renderer-state default pixel color */
 #define GZ_RGB_COLOR            99	
