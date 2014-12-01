@@ -108,7 +108,7 @@ GzMatrix	rotateY =
 
 	
 	/* set up a app-defined camera */
-    camera.position[X] = -0.2;
+    camera.position[X] = -0.1;
     camera.position[Y] = 0;
     camera.position[Z] = 0;
 
@@ -227,16 +227,16 @@ int Application5::Render()
 
 GzMatrix	scale_sphere = 
 { 
-	0.005,	0.0,	0.0,	0.0, 
-	0.0,	0.005,	0.0,	0.0, 
-	0.0,	0.0,	0.005,	0.0, 
+	0.01,	0.0,	0.0,	0.0, 
+	0.0,	0.01,	0.0,	0.0, 
+	0.0,	0.0,	0.01,	0.0, 
 	0.0,	0.0,	0.0,	1.0 
 }; 
 GzMatrix	scale_cube = 
 { 
-	1.5,	0.0,	0.0,	0.0, 
-	0.0,	1.5,	0.0,	0.0, 
-	0.0,	0.0,	1.5,	0.0, 
+	1.6,	0.0,	0.0,	0.0, 
+	0.0,	1.6,	0.0,	0.0, 
+	0.0,	0.0,	1.6,	0.0, 
 	0.0,	0.0,	0.0,	1.0 
 }; 	/* Initialize Display */
 	for(int i=0;i<AAKERNEL_SIZE;i++)
