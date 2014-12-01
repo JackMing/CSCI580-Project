@@ -453,22 +453,15 @@ LRESULT CCS580HWView::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
             break ;
 		  case 0x31:
 			one_pressed = true;
-			
                break ;
-
           case 0x32:
             two_pressed = true;
-			
                break ;
-               
           case 0x33:
-			three_pressed = true;
-			
+			three_pressed = true;		
                break ;
-               
           case 0x34:
             four_pressed = true;
-			
                break ;
 		  default:
 			  break;
@@ -479,31 +472,24 @@ LRESULT CCS580HWView::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
           case VK_UP:
 			up_pressed = false;
                break ;
-
           case VK_DOWN:
             down_pressed = false;
-               break ;
-               
+               break ;    
           case VK_LEFT:
 			left_pressed = false;
                break ;
-               
           case VK_RIGHT:
             right_pressed = false;
                break ;
-
 		  case 0x31:
 			one_pressed = false;
                break ;
-
           case 0x32:
             two_pressed = false;
                break ;
-               
           case 0x33:
 			three_pressed = false;
                break ;
-               
           case 0x34:
             four_pressed = false;
                break ;

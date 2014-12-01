@@ -19,7 +19,8 @@ static char THIS_FILE[]=__FILE__;
 #define new DEBUG_NEW
 #endif
 
-#define INFILE  "cube.asc"
+#define INFILE  "sphere.asc"
+#define SKYMAP  "cube.asc"
 #define OUTFILE "output.ppm"
 
 
@@ -34,7 +35,7 @@ void shade(GzCoord norm, GzCoord color);
 //-0.17, -0.29, 0.249,		0.58, -0.55, 0.104,		-0.31, -0.71, 0.106
 //};
 float AAFilter[6][3] = {
-1, 1, 1, 		0.41, 0.56, 0.119,		0.27, 0.08, 0.294,
+0, 0, 1, 		0.41, 0.56, 0.119,		0.27, 0.08, 0.294,
 -0.17, -0.29, 0.249,		0.58, -0.55, 0.104,		-0.31, -0.71, 0.106
 };
 //////////////////////////////////////////////////////////////////////
@@ -225,20 +226,20 @@ int Application5::Render()
 	int			status; 
 	int			face;
 
-GzMatrix	scale_sphere = 
-{ 
-	0.01,	0.0,	0.0,	0.0, 
-	0.0,	0.01,	0.0,	0.0, 
-	0.0,	0.0,	0.01,	0.0, 
-	0.0,	0.0,	0.0,	1.0 
-}; 
-GzMatrix	scale_cube = 
-{ 
-	1.6,	0.0,	0.0,	0.0, 
-	0.0,	1.6,	0.0,	0.0, 
-	0.0,	0.0,	1.6,	0.0, 
-	0.0,	0.0,	0.0,	1.0 
-}; 	/* Initialize Display */
+	GzMatrix	scale_obj = 
+	{ 
+		0.3,	0.0,	0.0,	0.0, 
+		0.0,	0.3,	0.0,	0.0, 
+		0.0,	0.0,	0.3,	0.0, 
+		0.0,	0.0,	0.0,	1.0 
+	}; 
+	GzMatrix	scale_cube = 
+	{ 
+		1.6,	0.0,	0.0,	0.0, 
+		0.0,	1.6,	0.0,	0.0, 
+		0.0,	0.0,	1.6,	0.0, 
+		0.0,	0.0,	0.0,	1.0 
+	}; 	/* Initialize Display */
 	for(int i=0;i<AAKERNEL_SIZE;i++)
 		status |= GzInitDisplay(m_pDisplay[i]); 
 	
@@ -251,19 +252,6 @@ GzMatrix	scale_cube =
 	nameListTriangle[3] = GZ_FACE;
 	// I/O File open
 	FILE *infile;
-	if( (infile  = fopen( INFILE , "r" )) == NULL )
-	{
-         AfxMessageBox( "The input file was not opened\n" );
-		 return GZ_FAILURE;
-	}
-
-	FILE *infile2;
-	if( (infile2  = fopen( "sphere_new.asc" , "r" )) == NULL )
-	{
-         AfxMessageBox( "The input file was not opened\n" );
-		 return GZ_FAILURE;
-	}
-
 	FILE *outfile;
 	if( (outfile  = fopen( OUTFILE , "wb" )) == NULL )
 	{
@@ -275,107 +263,66 @@ GzMatrix	scale_cube =
 	* Walk through the list of triangles, set color 
 	* and render each triangle 
 	*/
-	bool skybox=true;
-	nameListShader[0]  = GZ_INTERPOLATE;
-	int interpStyle = GZ_SKYBOX;// GZ_NORMALS;         /* Phong shading */
-	valueListShader[0] = (GzPointer)&interpStyle;
-	nameListShader[1]  = GZ_TEXTURE_MAP;
-	valueListShader[1] = (GzPointer)tex_fun;
-	for(int i=0;i<AAKERNEL_SIZE;i++){
-		GzPutAttribute(m_pRender[i], 2, nameListShader, valueListShader);
-		GzPushMatrix(m_pRender[i], scale_cube); 
-	}
-	while( fscanf(infile, "%s", dummy) == 1) { 	/* read in tri word */
-	    fscanf(infile, "%f %f %f %f %f %f %f %f", 
-		&(vertexList[0][0]), &(vertexList[0][1]),  
-		&(vertexList[0][2]), 
-		&(normalList[0][0]), &(normalList[0][1]), 	
-		&(normalList[0][2]), 
-		&(uvList[0][0]), &(uvList[0][1]) ); 
-		if(skybox){
-			fscanf(infile,"%d",&face);
+	bool skybox;
+	int interpStyle;
+	for(int idx=0;idx<2;idx++){
+		switch(idx){
+		case 0:
+			if( (infile  = fopen( SKYMAP , "r" )) == NULL )
+			{
+				 AfxMessageBox( "The input file was not opened\n" );
+				 return GZ_FAILURE;
+			}
+			skybox=true;
+			interpStyle = GZ_SKYBOX;
+			nameListShader[0]  = GZ_INTERPOLATE;
+			valueListShader[0] = (GzPointer)&interpStyle;
+			nameListShader[1]  = GZ_TEXTURE_MAP;
+			valueListShader[1] = (GzPointer)tex_fun;
+			for(int i=0;i<AAKERNEL_SIZE;i++){
+				GzPutAttribute(m_pRender[i], 2, nameListShader, valueListShader);
+				GzPushMatrix(m_pRender[i], scale_cube);
+			}
+			break;
+		case 1:
+			if( (infile  = fopen( INFILE , "r" )) == NULL )
+			{
+				 AfxMessageBox( "The input file was not opened\n" );
+				 return GZ_FAILURE;
+			}
+			skybox=false;
+			interpStyle = GZ_NORMALS;
+			nameListShader[0]  = GZ_INTERPOLATE;
+			valueListShader[0] = (GzPointer)&interpStyle;
+			nameListShader[1]  = GZ_TEXTURE_MAP;
+			valueListShader[1] = (GzPointer)0;
+			for(int i=0;i<AAKERNEL_SIZE;i++){
+				GzPutAttribute(m_pRender[i], 2, nameListShader, valueListShader);
+				GzPushMatrix(m_pRender[i], scale_obj); 
+			}
+			break;
 		}
-	    fscanf(infile, "%f %f %f %f %f %f %f %f", 
-		&(vertexList[1][0]), &(vertexList[1][1]), 	
-		&(vertexList[1][2]), 
-		&(normalList[1][0]), &(normalList[1][1]), 	
-		&(normalList[1][2]), 
-		&(uvList[1][0]), &(uvList[1][1]) ); 
-		if(skybox){
-			fscanf(infile,"%d",&face);
-		}
-	    fscanf(infile, "%f %f %f %f %f %f %f %f", 
-		&(vertexList[2][0]), &(vertexList[2][1]), 	
-		&(vertexList[2][2]), 
-		&(normalList[2][0]), &(normalList[2][1]), 	
-		&(normalList[2][2]), 
-		&(uvList[2][0]), &(uvList[2][1]) ); 
-		if(skybox){
-			fscanf(infile,"%d",&face);
-		}
-	    /* 
-	     * Set the value pointers to the first vertex of the 	
-	     * triangle, then feed it to the renderer 
-	     * NOTE: this sequence matches the nameList token sequence
-	     */ 
-	     valueListTriangle[0] = (GzPointer)vertexList; 
-		 valueListTriangle[1] = (GzPointer)normalList; 
-		 valueListTriangle[2] = (GzPointer)uvList; 
-		 if(skybox){
-			valueListTriangle[3] = (GzPointer)&face; 
-		}
-		for(int i=0;i<AAKERNEL_SIZE;i++)
-			 GzPutTriangle(m_pRender[i], (skybox)?4:3, nameListTriangle, valueListTriangle); 
-	}
-	
-	skybox=false;
-	nameListShader[0]  = GZ_INTERPOLATE;
-	interpStyle = GZ_NORMALS;// GZ_NORMALS;         /* Phong shading */
-	valueListShader[0] = (GzPointer)&interpStyle;
-	nameListShader[1]  = GZ_TEXTURE_MAP;
-	valueListShader[1] = (GzPointer)0;
-	for(int i=0;i<AAKERNEL_SIZE;i++){
-		GzPutAttribute(m_pRender[i], 2, nameListShader, valueListShader);
-		GzPopMatrix(m_pRender[i]);
-		GzPushMatrix(m_pRender[i], scale_sphere); 
-	}
-	while( fscanf(infile2, "%s", dummy) == 1) { 	/* read in tri word */
-	    fscanf(infile2, "%f %f %f %f %f %f %f %f", 
-		&(vertexList[0][0]), &(vertexList[0][1]),  
-		&(vertexList[0][2]), 
-		&(normalList[0][0]), &(normalList[0][1]), 	
-		&(normalList[0][2]), 
-		&(uvList[0][0]), &(uvList[0][1]) ); 
-
-	    fscanf(infile2, "%f %f %f %f %f %f %f %f", 
-		&(vertexList[1][0]), &(vertexList[1][1]), 	
-		&(vertexList[1][2]), 
-		&(normalList[1][0]), &(normalList[1][1]), 	
-		&(normalList[1][2]), 
-		&(uvList[1][0]), &(uvList[1][1]) ); 
-
-	    fscanf(infile2, "%f %f %f %f %f %f %f %f", 
-		&(vertexList[2][0]), &(vertexList[2][1]), 	
-		&(vertexList[2][2]), 
-		&(normalList[2][0]), &(normalList[2][1]), 	
-		&(normalList[2][2]), 
-		&(uvList[2][0]), &(uvList[2][1]) ); 
-
-	    /* 
-	     * Set the value pointers to the first vertex of the 	
-	     * triangle, then feed it to the renderer 
-	     * NOTE: this sequence matches the nameList token sequence
-	     */ 
-	     valueListTriangle[0] = (GzPointer)vertexList; 
-		 valueListTriangle[1] = (GzPointer)normalList; 
-		 valueListTriangle[2] = (GzPointer)uvList; 
-		 if(skybox){
-			valueListTriangle[3] = (GzPointer)&face; 
+		while( fscanf(infile, "%s", dummy) == 1) { 	/* read in tri word */
+			LoadFile(infile,vertexList,normalList,uvList,&face,skybox);
+			/* 
+			 * Set the value pointers to the first vertex of the 	
+			 * triangle, then feed it to the renderer 
+			 * NOTE: this sequence matches the nameList token sequence
+			 */ 
+			 valueListTriangle[0] = (GzPointer)vertexList; 
+			 valueListTriangle[1] = (GzPointer)normalList; 
+			 valueListTriangle[2] = (GzPointer)uvList; 
+			 if(skybox){
+				valueListTriangle[3] = (GzPointer)&face; 
+			}
+			for(int i=0;i<AAKERNEL_SIZE;i++)
+				 GzPutTriangle(m_pRender[i], (skybox)?4:3, nameListTriangle, valueListTriangle); 
 		}
 		for(int i=0;i<AAKERNEL_SIZE;i++)
-			 GzPutTriangle(m_pRender[i], (skybox)?4:3, nameListTriangle, valueListTriangle); 
+			GzPopMatrix(m_pRender[i]);
+		if( fclose( infile ) )
+			AfxMessageBox( "The input file was not closed\n" );
 	}
-
 
 
 	for(int j=0;j<m_pDisplay[0]->xres*m_pDisplay[0]->yres;j++){
@@ -397,12 +344,6 @@ GzMatrix	scale_cube =
 	/* 
 	 * Close file
 	 */ 
-
-	if( fclose( infile ) )
-      AfxMessageBox( "The input file was not closed\n" );
-
-	if( fclose( infile2 ) )
-      AfxMessageBox( "The input file was not closed\n" );
 
 	if( fclose( outfile ) )
       AfxMessageBox( "The output file was not closed\n" );
@@ -432,4 +373,33 @@ int Application5::Clean()
 }
 
 
+void Application5::LoadFile(FILE * infile, GzCoord *vertexList, GzCoord *normalList, GzTextureIndex *uvList, int *face, bool skybox){
 
+	    fscanf(infile, "%f %f %f %f %f %f %f %f", 
+		&(vertexList[0][0]), &(vertexList[0][1]),  
+		&(vertexList[0][2]), 
+		&(normalList[0][0]), &(normalList[0][1]), 	
+		&(normalList[0][2]), 
+		&(uvList[0][0]), &(uvList[0][1]) ); 
+		if(skybox){
+			fscanf(infile,"%d",face);
+		}
+	    fscanf(infile, "%f %f %f %f %f %f %f %f", 
+		&(vertexList[1][0]), &(vertexList[1][1]), 	
+		&(vertexList[1][2]), 
+		&(normalList[1][0]), &(normalList[1][1]), 	
+		&(normalList[1][2]), 
+		&(uvList[1][0]), &(uvList[1][1]) ); 
+		if(skybox){
+			fscanf(infile,"%d",face);
+		}
+	    fscanf(infile, "%f %f %f %f %f %f %f %f", 
+		&(vertexList[2][0]), &(vertexList[2][1]), 	
+		&(vertexList[2][2]), 
+		&(normalList[2][0]), &(normalList[2][1]), 	
+		&(normalList[2][2]), 
+		&(uvList[2][0]), &(uvList[2][1]) ); 
+		if(skybox){
+			fscanf(infile,"%d",face);
+		}
+}

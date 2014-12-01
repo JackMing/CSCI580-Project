@@ -718,10 +718,14 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int bgface){
 						NE = -NE;
 					}
 					mulVector(2*NE,N,tmp);
-					R[X] = E[X]+tmp[X];
-					R[Y] = E[Y]+tmp[Y];
-					R[Z] = E[Z]+tmp[Z];
-					
+					//R[X] = E[X]+tmp[X];
+					//R[Y] = E[Y]+tmp[Y];
+					//R[Z] = E[Z]+tmp[Z];
+					R[X] = N[X];
+					R[Y] = N[Y];
+					R[Z] = N[Z];
+
+
 					Xform(render->camera.Xwi,R); // transform the vector R to World space
 					
 					float absX,absY,absZ;
@@ -735,7 +739,7 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int bgface){
 							v = (R[Z]+absX)/2/absX;
 							
 							if(R[X]<0){
-								face+=3;
+								face = 3;
 								u = abs(1-u);
 								v = abs(1-v);
 							}else{
@@ -748,7 +752,7 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int bgface){
 							v = (R[Y]+absZ)/2/absZ;
 							
 							if(R[Z]<0){
-								face+=3;
+								face = 5;
 							}else{
 								v = abs(1-v);						
 							}
@@ -761,7 +765,7 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int bgface){
 							v = (R[Z]+absY)/2/absY;
 							
 							if(R[Y]<0){
-								face+=3;
+								face = 4;
 								v = abs(1-v);						
 							}else{
 								v = abs(1-v);
@@ -774,7 +778,7 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int bgface){
 							v = (R[Y]+absZ)/2/absZ;
 							
 							if(R[Z]<0){
-								face+=3;
+								face = 5;
 							}else{
 								v = abs(1-v);						
 							}

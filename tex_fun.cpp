@@ -21,7 +21,7 @@ int tex_fun(float u, float v, GzColor color, int bgface)
   if (reset) {          /* open and load texture file */
 	for(int countBG=0; countBG < 6; countBG++){
 		char filein[20];
-		sprintf(filein,"cubemap/x%d.ppm",(countBG+3)%6);
+		sprintf(filein,"cubemap/x%d.ppm",countBG);
 		fd = fopen (filein, "rb");
 		if (fd == NULL) {
 		  fprintf (stderr, "texture file not found\n");
@@ -47,11 +47,11 @@ int tex_fun(float u, float v, GzColor color, int bgface)
 	
   }
 
-  if(bgface%3 == 2){
-	u = abs(1-u);
-  }else{
-	v = abs(1-v);
-  }
+  //if(bgface%3 == 2){
+	//u = abs(1-u);
+  //}else{
+	//v = abs(1-v);
+  //}
 
 /* bounds-test u,v to make sure nothing will overflow image array bounds */
 /* determine texture cell corner values and perform bilinear interpolation */
