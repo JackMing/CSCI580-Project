@@ -585,13 +585,16 @@ void GzScanLine(GzRender *render, GzCoord *vertexList, GzCoord *normList, GzText
 	and span each scanline in the between
 */
 void edgeAdvance(GzRender *render, GzEdge *Le, GzEdge *Re, int bgface){
-
+	int delY = 1;
 	while((Le->current[Y] < Le->end[Y]) && (Re->current[Y] < Re->end[Y])){
 		/*span the scanline*/
 		span(render, Le, Re, bgface);
 		/* next scan line */
-		edgeAdvanceDel(Le, 1);
-		edgeAdvanceDel(Re, 1);
+		if(Le->current[Y]<0)
+			delY = -Le->current[Y];
+		else delY = 1;
+		edgeAdvanceDel(Le, delY);
+		edgeAdvanceDel(Re, delY);
 	}
 }
 
@@ -711,30 +714,33 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int bgface){
 					GzCoord N;
 					
 					memcpy(N,currentIntrp,sizeof(GzCoord));
+					unitVector(N);
 					
+					Xform(render->camera.Xwi,N);
+					Xform(render->camera.Xwi,E);
+
 					NE = dotProduct(E,N);
 					if(NE > 0){
 						mulVector(-1,N,N);
 						NE = -NE;
 					}
 					mulVector(2*NE,N,tmp);
-					//R[X] = E[X]+tmp[X];
-					//R[Y] = E[Y]+tmp[Y];
-					//R[Z] = E[Z]+tmp[Z];
-					R[X] = N[X];
-					R[Y] = N[Y];
-					R[Z] = N[Z];
+					R[X] = E[X]+tmp[X];
+					R[Y] = E[Y]+tmp[Y];
+					R[Z] = E[Z]+tmp[Z];
+					//R[X] = N[X];
+					//R[Y] = N[Y];
+					//R[Z] = N[Z];
 
 
-					Xform(render->camera.Xwi,R); // transform the vector R to World space
-					
+					//Xform(render->camera.Xwi,R); // transform the vector R to World space
+					//unitVector(R);
 					float absX,absY,absZ;
 					absX = abs(R[X]);
 					absY = abs(R[Y]);
 					absZ = abs(R[Z]);
 					if(absX>absY){
 						if(absX>absZ){
-							face = X;
 							u = (R[Y]+absX)/2/absX;
 							v = (R[Z]+absX)/2/absX;
 							
@@ -743,24 +749,24 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int bgface){
 								u = abs(1-u);
 								v = abs(1-v);
 							}else{
+								face = X;
 								v = abs(1-v);
 							}
 							
 						}else{
-							face = Z;
 							u = (R[X]+absZ)/2/absZ;
 							v = (R[Y]+absZ)/2/absZ;
 							
 							if(R[Z]<0){
 								face = 5;
 							}else{
+								face = Z;
 								v = abs(1-v);						
 							}
 							
 						}
 					}else{
 						if(absY>absZ){
-							face = Y;
 							u = (R[X]+absY)/2/absY;
 							v = (R[Z]+absY)/2/absY;
 							
@@ -768,23 +774,24 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int bgface){
 								face = 4;
 								v = abs(1-v);						
 							}else{
+								face = Y;
 								v = abs(1-v);
 								u = abs(1-u);
 							}
 							
 						}else{
-							face = Z;
 							u = (R[X]+absZ)/2/absZ;
 							v = (R[Y]+absZ)/2/absZ;
 							
 							if(R[Z]<0){
 								face = 5;
 							}else{
+								face = Z;
 								v = abs(1-v);						
 							}
 						}
 					}
-					//if(R[face]<0) face+=3;
+					//face = (face+3)%6;
 					/********************************************
 					  CubeMap Lookup - Initialize the cube map
 					*********************************************/
@@ -792,7 +799,7 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int bgface){
 						for(int i=0;i<6;i++){
 							FILE *fd;
 							char filein[20];
-							sprintf(filein,"cubemap/x%d.ppm",i);
+							sprintf(filein,"cubemap/sky%d.ppm",i);
 							fd = fopen(filein,"rb");
 							if (fd == NULL) {
 								fprintf (stderr, "texture file not found\n");
