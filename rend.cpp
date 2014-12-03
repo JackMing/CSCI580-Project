@@ -44,6 +44,8 @@ void warpTex(GzCoord*, GzTextureIndex*);
 void unWarpTex(GzCoord, GzTextureIndex);
 
 GzColor *image[6];
+int imageX ;//= render->display->xres;
+int imageY ;//= render->display->yres;
 
 int GzRotXMat(float degree, GzMatrix mat)
 {
@@ -682,8 +684,6 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int bgface){
 					GzCoord R={0,0,0},tmp={0,0,0};
 					int face = 0;
 					float u,v;
-					int xs = render->display->xres;
-					int ys = render->display->yres;
 					GzColor cubeCol[6]={{0,100,0},{0,128,0},{154,204,255},{51,204,51},{0,255,0}
 					,{102,102,255}};
 					int texU,texV;
@@ -725,9 +725,9 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int bgface){
 						NE = -NE;
 					}
 					mulVector(2*NE,N,tmp);
-					R[X] = E[X]+tmp[X];
-					R[Y] = E[Y]+tmp[Y];
-					R[Z] = E[Z]+tmp[Z];
+					R[X] = E[X]-tmp[X];
+					R[Y] = E[Y]-tmp[Y];
+					R[Z] = E[Z]-tmp[Z];
 					//R[X] = N[X];
 					//R[Y] = N[Y];
 					//R[Z] = N[Z];
@@ -799,7 +799,7 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int bgface){
 						for(int i=0;i<6;i++){
 							FILE *fd;
 							char filein[20];
-							sprintf(filein,"cubemap/sky%d.ppm",i);
+							sprintf(filein,"%s%d.ppm",CUBEMAP,i);
 							fd = fopen(filein,"rb");
 							if (fd == NULL) {
 								fprintf (stderr, "texture file not found\n");
@@ -809,13 +809,13 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int bgface){
 							unsigned char pixel[3];
 							unsigned char dummy;
 							int dum;
-							fscanf (fd, "%s %d %d %c", foo, &dum, &dum, &dummy);
-							image[i] = (GzColor*)malloc(sizeof(GzColor)*(xs+1)*(ys+1));
+							fscanf (fd, "%s %d %d %c", foo, &imageX, &imageY, &dummy);
+							image[i] = (GzColor*)malloc(sizeof(GzColor)*(imageX+1)*(imageY+1));
 							if(image[i]==NULL){
 								fprintf (stderr, "malloc for texture image failed\n");
 								exit(-1);
 							}
-							for (int x = 0; x < xs*ys; x++) {	/* create array of GzColor values */
+							for (int x = 0; x < imageX*imageY; x++) {	/* create array of GzColor values */
 								fread(pixel, sizeof(pixel), 1, fd);
 								image[i][x][RED] = (float)((int)pixel[RED]) * (1.0 / 255.0);//(float)((int)cubeCol[i][RED]) * (1.0 / 255.0);//
 								image[i][x][GREEN] = (float)((int)pixel[GREEN]) * (1.0 / 255.0);//(float)((int)cubeCol[i][GREEN]) * (1.0 / 255.0);//
@@ -829,8 +829,8 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int bgface){
 					*********************************************/
 					GzTextureIndex tex;
 					float s, t;
-					tex[U] = u*(xs-1);
-					tex[V] = v*(ys-1);
+					tex[U] = u*(imageX-1);
+					tex[V] = v*(imageY-1);
 					s = tex[U] - (int)tex[U];
 					t = tex[V] - (int)tex[V];
 					texU = (int)tex[U];
@@ -838,10 +838,10 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int bgface){
 
 					for (int i=0; i<3; i++){
 						col[i] = 
-							image[face][ texU    + texV   *xs][i] * (1-s)*(1-t) +
-							image[face][(texU+1) + texV   *xs][i] *    s *(1-t) +
-							image[face][(texU+1) +(texV+1)*xs][i] *    s * t    +
-							image[face][ texU    +(texV+1)*xs][i] * (1-s)* t;
+							image[face][ texU    + texV   *imageX][i] * (1-s)*(1-t) +
+							image[face][(texU+1) + texV   *imageX][i] *    s *(1-t) +
+							image[face][(texU+1) +(texV+1)*imageX][i] *    s * t    +
+							image[face][ texU    +(texV+1)*imageX][i] * (1-s)* t;
 						
 					}
 					/*******************************************/

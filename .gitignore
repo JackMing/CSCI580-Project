@@ -42,6 +42,9 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+ipch/*
+Release/*
 Debug/*
 *.sdf
 *.bak
+*.*.bak

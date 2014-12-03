@@ -21,7 +21,7 @@ static char THIS_FILE[]=__FILE__;
 
 #define INFILE  "sphere.asc"
 #define SKYMAP  "cube.asc"
-#define OUTFILE "output.ppm"
+#define OUTFILE "Demo7-"
 
 
 extern int tex_fun(float u, float v, GzColor color, int bgface); /* image texture function */
@@ -38,6 +38,8 @@ float AAFilter[6][3] = {
 0, 0, 1, 		0.41, 0.56, 0.119,		0.27, 0.08, 0.294,
 -0.17, -0.29, 0.249,		0.58, -0.55, 0.104,		-0.31, -0.71, 0.106
 };
+
+int fcount=0;
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -104,12 +106,12 @@ GzMatrix	rotateY =
 	/* 
 	 * initialize the display and the renderer 
 	 */ 
- 	m_nWidth = 256;		// frame buffer and display width
-	m_nHeight = 256;    // frame buffer and display height
+ 	m_nWidth = 768;		// frame buffer and display width
+	m_nHeight = 768;    // frame buffer and display height
 
 	
 	/* set up a app-defined camera */
-    camera.position[X] = -0.6;
+    camera.position[X] = -0.7;
     camera.position[Y] = 0;
     camera.position[Z] = 0;
 
@@ -119,7 +121,7 @@ GzMatrix	rotateY =
 
     camera.worldup[X] = 0.0;
     camera.worldup[Y] = 0.0;
-    camera.worldup[Z] = -1.0;
+    camera.worldup[Z] = 1.0;
 
     camera.FOV = 63.7; /* degree */
 
@@ -222,15 +224,29 @@ int Application5::Render()
 	GzCoord		vertexList[3];	/* vertex position coordinates */ 
 	GzCoord		normalList[3];	/* vertex normals */ 
 	GzTextureIndex  	uvList[3];		/* vertex texture map indices */ 
-	char		dummy[256]; 
+	char		dummy[1000]; 
 	int			status; 
 	int			face;
 
 	GzMatrix	scale_obj = 
 	{ 
-		0.3,	0.0,	0.0,	0.0, 
-		0.0,	0.3,	0.0,	0.0, 
-		0.0,	0.0,	0.3,	0.0, 
+		0.6,	0.0,	0.0,	0.0, 
+		0.0,	0.6,	0.0,	0.0, 
+		0.0,	0.0,	0.6,	0.0, 
+		0.0,	0.0,	0.0,	1.0 
+	}; 
+	GzMatrix	rotateY_obj = 
+	{ 
+		-1.0,	0.0,	0.0,	0.0, 
+		0.0,	1.0,	0.0,	0.0, 
+		0.0,	0.0,	-1.0,	0.0, 
+		0.0,	0.0,	0.0,	1.0 
+	}; 
+	GzMatrix	rotateZ_obj = 
+	{ 
+		0.0,	1.0,	0.0,	0.0, 
+		-1.0,	0.0,	0.0,	0.0, 
+		0.0,	0.0,	1.0,	0.0, 
 		0.0,	0.0,	0.0,	1.0 
 	}; 
 	GzMatrix	scale_cube = 
@@ -253,7 +269,11 @@ int Application5::Render()
 	// I/O File open
 	FILE *infile;
 	FILE *outfile;
-	if( (outfile  = fopen( OUTFILE , "wb" )) == NULL )
+	char ofilename[70];
+
+	sprintf(ofilename,"D:\\JackMing\\Desktop\\csci580-capture\\%s%02d.ppm",OUTFILE,fcount++);
+
+	if( (outfile  = fopen( ofilename , "wb" )) == NULL )
 	{
          AfxMessageBox( "The output file was not opened\n" );
 		 return GZ_FAILURE;
@@ -299,6 +319,8 @@ int Application5::Render()
 			for(int i=0;i<AAKERNEL_SIZE;i++){
 				GzPutAttribute(m_pRender[i], 2, nameListShader, valueListShader);
 				GzPushMatrix(m_pRender[i], scale_obj); 
+				//GzPushMatrix(m_pRender[i], rotateY_obj);
+				//GzPushMatrix(m_pRender[i], rotateZ_obj);
 			}
 			break;
 		}
@@ -318,8 +340,13 @@ int Application5::Render()
 			for(int i=0;i<AAKERNEL_SIZE;i++)
 				 GzPutTriangle(m_pRender[i], (skybox)?4:3, nameListTriangle, valueListTriangle); 
 		}
-		for(int i=0;i<AAKERNEL_SIZE;i++)
+		for(int i=0;i<AAKERNEL_SIZE;i++){
+			//if(idx==1){
+				//GzPopMatrix(m_pRender[i]);
+				//GzPopMatrix(m_pRender[i]);
+			//}
 			GzPopMatrix(m_pRender[i]);
+		}
 		if( fclose( infile ) )
 			AfxMessageBox( "The input file was not closed\n" );
 	}

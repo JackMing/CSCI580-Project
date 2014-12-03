@@ -8,7 +8,7 @@
 #define GZ_SUCCESS      0
 #define GZ_FAILURE      1
 
-#define RADIUS 1;
+#define CUBEMAP "cubemap/scene"
 
 #define PI 3.14159265
 /*
