@@ -19,8 +19,8 @@ static char THIS_FILE[]=__FILE__;
 #define new DEBUG_NEW
 #endif
 
-#define INFILE  "sphere.asc"
-#define SKYMAP  "cube.asc"
+#define INFILE  "teapot.asc"
+#define SKYMAP  "sphere.asc"
 #define OUTFILE "Demo7-"
 
 
@@ -39,7 +39,7 @@ float AAFilter[6][3] = {
 -0.17, -0.29, 0.249,		0.58, -0.55, 0.104,		-0.31, -0.71, 0.106
 };
 
-int fcount=0;
+int fcount=199;
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -161,7 +161,7 @@ GzMatrix	rotateY =
 	* Select either GZ_COLOR or GZ_NORMALS as interpolation mode  
 	*/
 	nameListShader[1]  = GZ_INTERPOLATE;
-	interpStyle = GZ_SKYBOX;// GZ_NORMALS;         /* Phong shading */
+	interpStyle = GZ_NORMALS;         /* Phong shading */
 	valueListShader[1] = (GzPointer)&interpStyle;
 	nameListShader[2]  = GZ_AMBIENT_COEFFICIENT;
 	valueListShader[2] = (GzPointer)ambientCoefficient;
@@ -227,12 +227,12 @@ int Application5::Render()
 	char		dummy[1000]; 
 	int			status; 
 	int			face;
-
+	// 0.6 for sphere.asc, 0.01 for teapot.asc
 	GzMatrix	scale_obj = 
 	{ 
-		0.6,	0.0,	0.0,	0.0, 
-		0.0,	0.6,	0.0,	0.0, 
-		0.0,	0.0,	0.6,	0.0, 
+		0.01,	0.0,	0.0,	0.0, 
+		0.0,	0.01,	0.0,	0.0, 
+		0.0,	0.0,	0.01,	0.0, 
 		0.0,	0.0,	0.0,	1.0 
 	}; 
 	GzMatrix	rotateY_obj = 
@@ -251,9 +251,9 @@ int Application5::Render()
 	}; 
 	GzMatrix	scale_cube = 
 	{ 
-		1.7,	0.0,	0.0,	0.0, 
-		0.0,	1.7,	0.0,	0.0, 
-		0.0,	0.0,	1.7,	0.0, 
+		5,	0.0,	0.0,	0.0, 
+		0.0,	5,	0.0,	0.0, 
+		0.0,	0.0,	5,	0.0, 
 		0.0,	0.0,	0.0,	1.0 
 	}; 	/* Initialize Display */
 	for(int i=0;i<AAKERNEL_SIZE;i++)
@@ -271,12 +271,12 @@ int Application5::Render()
 	FILE *outfile;
 	char ofilename[70];
 
-	sprintf(ofilename,"D:\\JackMing\\Desktop\\csci580-capture\\%s%02d.ppm",OUTFILE,fcount++);
+	sprintf(ofilename,"D:\\JackMing\\Desktop\\csci580-capture\\%s%03d.ppm",OUTFILE,fcount++);
 
 	if( (outfile  = fopen( ofilename , "wb" )) == NULL )
 	{
-         AfxMessageBox( "The output file was not opened\n" );
-		 return GZ_FAILURE;
+         //AfxMessageBox( "The output file was not opened\n" );
+		 //return GZ_FAILURE;
 	}
 
 	/* 
@@ -293,7 +293,9 @@ int Application5::Render()
 				 AfxMessageBox( "The input file was not opened\n" );
 				 return GZ_FAILURE;
 			}
-			skybox=true;
+			//skybox=true;
+			//interpStyle = GZ_SKYBOX;
+			skybox=false;
 			interpStyle = GZ_SKYBOX;
 			nameListShader[0]  = GZ_INTERPOLATE;
 			valueListShader[0] = (GzPointer)&interpStyle;
@@ -319,8 +321,8 @@ int Application5::Render()
 			for(int i=0;i<AAKERNEL_SIZE;i++){
 				GzPutAttribute(m_pRender[i], 2, nameListShader, valueListShader);
 				GzPushMatrix(m_pRender[i], scale_obj); 
-				//GzPushMatrix(m_pRender[i], rotateY_obj);
-				//GzPushMatrix(m_pRender[i], rotateZ_obj);
+				GzPushMatrix(m_pRender[i], rotateY_obj);
+				GzPushMatrix(m_pRender[i], rotateZ_obj);
 			}
 			break;
 		}
