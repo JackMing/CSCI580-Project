@@ -413,6 +413,7 @@ int GzPutTriangle(GzRender	*render, int numParts, GzToken *nameList, GzPointer	*
 		switch(nameList[i]){
 		case GZ_NULL_TOKEN:
 			break;
+		//case GZ_SKYBOX:
 		case GZ_NORMAL:
 			// Transform the normal vector from model to image space
 			memcpy(normList,valueList[i],sizeof(GzCoord)*3);
@@ -456,8 +457,8 @@ int GzPutTriangle(GzRender	*render, int numParts, GzToken *nameList, GzPointer	*
 			if((vertexList[0][X]>render->display->xres && vertexList[1][X]>render->display->xres && vertexList[2][X]>render->display->xres) ||
 				(vertexList[0][Y]>render->display->yres && vertexList[1][Y]>render->display->yres && vertexList[2][Y]>render->display->yres) ||
 				(vertexList[0][X]<0 && vertexList[1][X]<0 && vertexList[2][X]<0) ||
-				(vertexList[0][Y]<0 && vertexList[1][Y]<0 && vertexList[2][Y]<0))
-				status |= GZ_FAILURE;
+				(vertexList[0][Y]<0 && vertexList[1][Y]<0 && vertexList[2][Y]<0));
+				//status |= GZ_FAILURE;
 			break;
 		case GZ_TEXTURE_INDEX:
 			memcpy(texureList,valueList[i],sizeof(GzTextureIndex)*3);
@@ -496,7 +497,7 @@ int Xform(GzMatrix mat, GzCoord vec){
 		vec[Y] = after[Y];
 		vec[Z] = after[Z];
 	}
-	if(after[2]<0)
+	if(after[2]<0) // the Z-axis out of screen
 		return GZ_FAILURE;
 	return GZ_SUCCESS;
 }
@@ -696,6 +697,7 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int bgface){
 						0,
 						(GzDepth)current[Z]);
 					break;
+				case GZ_SKYBOX:
 				case GZ_NORMAL: //Phong
 					GzColor col;
 					unitVector(currentIntrp);
@@ -712,6 +714,9 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int bgface){
 					*********************************************/
 					float NE;
 					GzCoord N;
+					if(render->interp_mode == GZ_SKYBOX){
+						E[2]=-1;
+					}
 					
 					memcpy(N,currentIntrp,sizeof(GzCoord));
 					unitVector(N);
@@ -749,7 +754,7 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int bgface){
 								u = abs(1-u);
 								v = abs(1-v);
 							}else{
-								face = X;
+								face = 0;
 								v = abs(1-v);
 							}
 							
@@ -760,7 +765,7 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int bgface){
 							if(R[Z]<0){
 								face = 5;
 							}else{
-								face = Z;
+								face = 2;
 								v = abs(1-v);						
 							}
 							
@@ -774,7 +779,7 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int bgface){
 								face = 4;
 								v = abs(1-v);						
 							}else{
-								face = Y;
+								face = 1;
 								v = abs(1-v);
 								u = abs(1-u);
 							}
@@ -786,12 +791,11 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int bgface){
 							if(R[Z]<0){
 								face = 5;
 							}else{
-								face = Z;
+								face = 2;
 								v = abs(1-v);						
 							}
 						}
 					}
-					//face = (face+3)%6;
 					/********************************************
 					  CubeMap Lookup - Initialize the cube map
 					*********************************************/
@@ -877,6 +881,7 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int bgface){
 						0,
 						(GzDepth)current[Z]);
 					break;
+				/*
 				case GZ_SKYBOX:
 					//GzColor intrpedCol;
 					GzColor Kt;
@@ -894,6 +899,7 @@ void span(GzRender *render, GzEdge *le, GzEdge *re, int bgface){
 						0,
 						(GzDepth)current[Z]);
 					break;
+				*/
 				default:
 					break;
 				}
@@ -930,6 +936,7 @@ bool edgeInit(GzRender *render, GzEdge *e, float *start, float *end, float *star
 	switch(render->interp_mode){
 	case GZ_FLAT:
 		break;
+	case GZ_SKYBOX:
 	case GZ_NORMAL:
 		//Interpolate Normal
 		memcpy(e->startIntrp,startN,sizeof(GzCoord));
